@@ -1,0 +1,19 @@
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Editors & local tooling
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Local archives / temp builds
+*.zip
+*.tar.gz
+dist/
