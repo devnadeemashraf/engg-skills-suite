@@ -1,0 +1,129 @@
+# Answer key for evals/fixtures/ts-messy-api. Scored by evals/score.py.
+#
+# A finding matches a defect when its location's file is in `files`, its action is in `actions`,
+# and its title or evidence contains at least one keyword (case-insensitive).
+# Each finding can match at most one defect. `max_severity` is the mildest acceptable rating:
+# a match rated milder counts as "under-rated".
+fixture: ts-messy-api
+defects:
+  - id: D1
+    what: Domain imports an adapter type (layer violation)
+    files: [src/orders/domain/order.ts]
+    actions: [MOVE]
+    keywords: [adapter, layer, OrderRow, domain-not-to-adapters]
+    max_severity: P1
+  - id: D2
+    what: Import cycle between pricing and place-order
+    files: [src/orders/app/pricing.ts, src/orders/app/place-order.ts]
+    actions: [MOVE, SPLIT, SIMPLIFY]
+    keywords: [cycle, circular]
+    max_severity: P2
+  - id: D3
+    what: Whole file nothing imports
+    files: [src/shared/legacy-format.ts]
+    actions: [STRIP]
+    keywords: [unused, dead, legacy, unreferenced, nothing]
+    max_severity: P3
+  - id: D4
+    what: Email validation duplicated in three modules
+    files: [src/orders/app/place-order.ts, src/orders/app/cancel-order.ts, src/users/app/register.ts]
+    actions: [MERGE]
+    keywords: [duplicat, email, isValidEmail, copy, copies]
+    max_severity: P2
+  - id: D5
+    what: Outbound payment call with no timeout
+    files: [src/orders/adapters/payment-client.ts]
+    actions: [HARDEN]
+    keywords: [timeout, abort, signal, hang]
+    max_severity: P1
+  - id: D6
+    what: Secret committed in source
+    files: [src/config.ts]
+    actions: [HARDEN]
+    keywords: [secret, gitleaks, credential, api key, api-key]
+    max_severity: P0
+  - id: D7
+    what: SQL built by string concatenation (injection)
+    files: [src/orders/adapters/order-repo.ts]
+    actions: [HARDEN]
+    keywords: [sql, injection, concatenat, parameter]
+    max_severity: P0
+  - id: D8
+    what: Order read without an owner check (IDOR)
+    files: [src/orders/http/routes.ts]
+    actions: [HARDEN]
+    keywords: [owner, authoriz, idor, access control, any user]
+    max_severity: P0
+  - id: D9
+    what: placeOrder is a 14-branch function
+    files: [src/orders/app/place-order.ts]
+    actions: [SIMPLIFY, SPLIT]
+    keywords: [complex, ccn, branch]
+    max_severity: P2
+  - id: D10
+    what: Users module reaches into orders internals
+    files: [src/users/app/register.ts]
+    actions: [MOVE]
+    keywords: [public entry, modules-isolated, internal, index, module]
+    max_severity: P2
+  - id: D11
+    what: One-off script under src/ that belongs to no layer
+    files: [src/scratch/tmp-migrate.ts]
+    actions: [STRIP, MOVE]
+    keywords: [layer, scratch, script, unassigned, unused, migrat]
+    max_severity: P3
+  - id: D12
+    what: Payment errors swallowed by an empty catch
+    files: [src/orders/adapters/payment-client.ts]
+    actions: [HARDEN]
+    keywords: [catch, swallow, hides, error]
+    max_severity: P1
+  - id: D13
+    what: Exported function nothing uses
+    files: [src/shared/utils.ts]
+    actions: [STRIP]
+    keywords: [unused, formatCurrencyOld, dead, unreferenced]
+    max_severity: P3
+  - id: D14
+    what: Money handled as floating-point dollars
+    files: [src/orders/app/place-order.ts]
+    actions: [HARDEN, SIMPLIFY, MOVE]
+    keywords: [float, cents, money, rounding, decimal]
+    max_severity: P2
+  - id: D15
+    what: No tests for the riskiest function
+    files: [src/orders/app/place-order.ts]
+    actions: [TEST]
+    keywords: [test]
+    max_severity: P2
+  - id: D16
+    what: Adapter imports the composition root's config instead of receiving it
+    files: [src/orders/adapters/payment-client.ts]
+    actions: [MOVE, HARDEN]
+    keywords: [config, composition, adapters-not-to-composition, inject]
+    max_severity: P2
+  - id: D17
+    what: HTTP handler calls the repository directly, bypassing the application layer
+    files: [src/orders/http/routes.ts]
+    actions: [MOVE]
+    keywords: [adapter, transport-not-to-adapters, application, repository, bypass]
+    max_severity: P2
+  # Found in the first dry run: real defects present in the fixture (the clean twin fixes all three).
+  - id: D18
+    what: Any user can cancel any order (no owner check)
+    files: [src/orders/app/cancel-order.ts]
+    actions: [HARDEN]
+    keywords: [owner, authoriz, anyone, any order]
+    max_severity: P1
+  - id: D19
+    what: Order ids from Date.now() collide under concurrency
+    files: [src/orders/app/place-order.ts]
+    actions: [HARDEN]
+    keywords: [date.now, collide, collision, unique, id generator]
+    max_severity: P2
+  - id: D20
+    what: Config silently falls back to a placeholder payment URL instead of failing fast
+    files: [src/config.ts]
+    actions: [HARDEN]
+    keywords: [fail fast, fail-fast, default, fallback, validat, startup]
+    max_severity: P2

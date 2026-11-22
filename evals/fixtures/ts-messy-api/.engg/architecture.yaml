@@ -1,0 +1,35 @@
+# Eval fixture: the agreed architecture for a small orders/users API.
+# The code under src/ deliberately breaks it in places; see ../../expected/ts-messy-api.yaml.
+version: 1
+name: messy-api
+style: hexagonal
+layers:
+  - name: domain
+    paths: ["src/*/domain/**"]
+    may_import: []
+    external: none
+  - name: application
+    paths: ["src/*/app/**", "src/orders/index.ts"]
+    may_import: [domain, shared]
+  - name: adapters
+    paths: ["src/*/adapters/**"]
+    may_import: [domain, application, shared]
+  - name: transport
+    paths: ["src/*/http/**"]
+    may_import: [application, domain, shared]
+  - name: shared
+    paths: ["src/shared/**"]
+    may_import: []
+  - name: composition
+    paths: ["src/main.ts", "src/config.ts"]
+    may_import: ["*"]
+modules:
+  paths: "src/*"
+  public_entry: [index.ts]
+rules:
+  no_cycles: true
+limits:
+  max_file_lines: 300
+  max_function_complexity: 10
+targets:
+  typescript: {}
