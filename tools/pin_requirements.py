@@ -23,6 +23,13 @@ DEV_PINS = {
     "pluggy": ("1.7.0", None),
     "pygments": ("2.21.0", None),
     "colorama": ("0.4.6", 'sys_platform == "win32"'),
+    # import-linter: runs the compiled Python architecture contract in tests.
+    "import-linter": ("2.17", None),
+    "grimp": ("3.20", None),
+    "click": ("8.5.1", None),
+    "rich": ("15.0.0", None),
+    "markdown-it-py": ("4.3.0", None),
+    "mdurl": ("0.1.2", None),
 }
 
 # requirements-lint.txt: GitHub Actions security linter (ships as a self-contained wheel).

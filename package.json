@@ -1,0 +1,13 @@
+{
+  "name": "engg-skills-suite-dev",
+  "private": true,
+  "description": "Dev-only tooling for testing the suite's compiled architecture contracts. Not part of any skill.",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "dependency-cruiser": "18.8.0",
+    "typescript": "6.0.3"
+  }
+}
