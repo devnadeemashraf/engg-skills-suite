@@ -60,14 +60,15 @@ Fix every P0 and P1 finding with regression tests, re-run verification, and draf
 ## Recipe 4: Hardening an Existing Codebase (Brownfield Rescue)
 
 ```text
-/engg-audit Run Mode B on <directory or entire repo>.
+/engg-deep-audit Audit <directory or entire repo> against .engg/architecture.yaml, layer by layer.
+(No contract yet? It will offer to draft the as-is contract and hand off to /engg-architect first.)
 Produce the 6-pillar health scorecard, severity-ranked P0-P3 findings, and a strangler-fig hardening plan starting with characterization tests before any risky refactors.
 ```
 
 Then convert the remediation plan into chunks:
 
 ```text
-/engg-plan Turn the Mode B audit report into remediation Waves (Wave 1: safety-net tests + P0 blockers; Wave 2: P1 bounds/leaks/perf; Wave 3: P2 architectural cleanup).
+/engg-plan Turn the deep-audit REPORT.md into remediation Waves (Wave 1: safety-net tests + P0 blockers; Wave 2: P1 bounds/leaks/perf; Wave 3: P2 architectural cleanup).
 ```
 
 ---

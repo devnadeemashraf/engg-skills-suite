@@ -2,14 +2,14 @@
 
 # Unified Engineering Skills Suite (`engg-skills-suite`)
 
-**One model-agnostic, stack-agnostic suite of 11 Principal-grade Agent Skills covering the entire software engineering lifecycle — from raw idea and roadmap grilling to strict TDD, adversarial auditing, zero-downtime migrations, and production shipping.**
+**One model-agnostic, stack-agnostic suite of 12 Principal-grade Agent Skills covering the entire software engineering lifecycle — from raw idea and roadmap grilling to strict TDD, adversarial auditing, zero-downtime migrations, and production shipping.**
 
 [![Agent Skills Spec](https://img.shields.io/badge/Standard-agentskills.io-2563EB?style=for-the-badge)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/Skills-11%20Unified-0F766E?style=for-the-badge)](#-the-11-skill-catalog)
+[![Skills](https://img.shields.io/badge/Skills-12%20Unified-0F766E?style=for-the-badge)](#-the-11-skill-catalog)
 [![Surfaces](https://img.shields.io/badge/Stacks-Backend%20%7C%20Web%20%7C%20Mobile%20%7C%20Game%20%7C%20Data%20%7C%20DevOps-4F46E5?style=for-the-badge)](#-supported-engineering-surfaces)
 [![License](https://img.shields.io/badge/License-Apache--2.0-334155?style=for-the-badge)](LICENSE)
 
-[Why This Suite](#-why-this-suite-exists) • [The 11 Skills](#-the-11-skill-catalog) • [How I Use It](#-how-i-use-it-real-workflows--why) • [Install & Setup](#-installation--idecli-setup) • [Repo Structure](#-repository-structure)
+[Why This Suite](#-why-this-suite-exists) • [The 12 Skills](#-the-12-skill-catalog) • [How I Use It](#-how-i-use-it-real-workflows--why) • [Install & Setup](#-installation--idecli-setup) • [Repo Structure](#-repository-structure)
 
 </div>
 
@@ -19,7 +19,7 @@
 
 AI coding agents are fast—until they drift. Without strict guardrails, different models invent inconsistent architectures, skip edge-case tests, guess outdated package versions, bloat roadmaps, and silently introduce security or concurrency bugs.
 
-This repository packages my personal engineering operating system into **11 portable, open-standard (`SKILL.md`) skills** so **any LLM in any CLI or IDE** enforces the exact same discipline across every repository I touch:
+This repository packages my personal engineering operating system into **12 portable, open-standard (`SKILL.md`) skills** so **any LLM in any CLI or IDE** enforces the exact same discipline across every repository I touch:
 
 - **Timeless Engineering Design:** Strict **SOLID**, **DRY** (knowledge, not coincidental code), **KISS**, **ATOMIC** (modular composition, atomic state transitions, atomic commits), and **Hexagonal / Ports & Adapters** dependency flow.
 - **Five Non-Negotiable Production Invariants:** Explicit Contracts First, Defense-in-Depth Security, Bounded Everything (timeouts, pools, payloads, memory, frame budgets), Observable by Default, and Graceful Lifecycle.
@@ -43,6 +43,7 @@ flowchart LR
     E --> F
     F -- "Fixes & Next Chunk" --> C
     F -- "Clean & Verified" --> G["engg-ship<br/>CI/CD, IaC & Safe Rollout"]
+    X["engg-deep-audit<br/>Whole-Repo Audit vs. Contract"] --> C
 
     subgraph Specialists["On-Demand Specialists (Invoked at Any Stage)"]
         H["engg-research<br/>Live Docs & Exact Pinning"]
@@ -53,7 +54,7 @@ flowchart LR
 
 ---
 
-## The 11-Skill Catalog
+## The 12-Skill Catalog
 
 | #   | Skill                                                | Stage           | What It Does                                                                                                                                                                      | When I Reach for It                                                                            |
 | --- | ---------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
@@ -63,11 +64,12 @@ flowchart LR
 | 4   | **[`engg-plan`](skills/engg-plan/SKILL.md)**           | Planning        | Breaks any EDD, hardened roadmap milestone, or audit backlog into MVP-first progressive Waves and thin vertical **Atomic Chunks** (1–5 files each).                               | Turning an approved design or next milestone into an executable build queue.                   |
 | 5   | **[`engg-build`](skills/engg-build/SKILL.md)**         | Build & TDD     | Implements one chunk at a time via strict **Red → Green → Refactor** with a mandatory **5-category Test Matrix** (Happy, Fuzz, Concurrency, Fault, Security).                     | Building core functionality without letting test-after drift creep in.                         |
 | 6   | **[`engg-extend`](skills/engg-extend/SKILL.md)**       | Evolution       | **Mode A:** Adds a vertical feature slice matching repo conventions. **Mode B:** Adds/swaps an adapter behind a port with **shared LSP contract tests**.                          | Growing an existing repo cleanly or swapping DBs, caches, queues, SDKs, or UI/engine backends. |
-| 7   | **[`engg-audit`](skills/engg-audit/SKILL.md)**         | Review & Harden | **Mode A:** Mandatory post-chunk/PR audit. **Mode B:** Full existing codebase/subsystem hardening. **Mode C:** Audits & tightens specs/plans written by another LLM.              | Before every commit, when onboarding onto messy code, or validating another model's plan.      |
-| 8   | **[`engg-research`](skills/engg-research/SKILL.md)**   | Verification    | Enforces zero-memory-guessing live doc/CVE lookup and strict exact dependency, lockfile, and container digest pinning.                                                            | Picking libraries, upgrading major versions, or checking current API signatures.               |
-| 9   | **[`engg-debug`](skills/engg-debug/SKILL.md)**         | Diagnostics     | Scientific debugging & profiling loop (Reproduce → Measure → Hypothesize → Isolate → Root-Cause Fix → Regression Test).                                                           | Hunting races, memory leaks, p99 spikes, Web Vitals jank, mobile ANRs, or game frame drops.    |
-| 10  | **[`engg-data`](skills/engg-data/SKILL.md)**           | Persistence     | Schema modeling, index design, `EXPLAIN ANALYZE` verification, throttled backfills, and **zero-downtime expand-and-contract migrations**.                                         | Touching databases, writing migrations, or eliminating slow queries and lock hazards.          |
-| 11  | **[`engg-ship`](skills/engg-ship/SKILL.md)**           | Release & Ops   | Hardened CI quality gates, non-root immutable containers, declarative IaC, observability/SLOs, Production Readiness Review, rollbacks, and atomic commits.                        | Setting up CI/CD, containerizing, deploying safely, or writing rollback runbooks.              |
+| 7   | **[`engg-audit`](skills/engg-audit/SKILL.md)**         | Review & Harden | **Mode A:** Mandatory post-chunk/PR audit. **Mode C:** Audits & tightens specs/plans written by another LLM. (Whole codebases: `engg-deep-audit`.)                                 | Before every commit or merge, or validating another model's plan.                              |
+| 8   | **[`engg-deep-audit`](skills/engg-deep-audit/SKILL.md)** | Codebase Audit | Maps the whole repo with open-source tools, then reviews it **layer by layer, unit by unit** against the architecture contract, with progress on disk. Emits a strip list, move list, and remediation waves. | Onboarding onto a messy repo, measuring drift from the architecture, or planning a cleanup. |
+| 9   | **[`engg-research`](skills/engg-research/SKILL.md)**   | Verification    | Enforces zero-memory-guessing live doc/CVE lookup and strict exact dependency, lockfile, and container digest pinning.                                                            | Picking libraries, upgrading major versions, or checking current API signatures.               |
+| 10  | **[`engg-debug`](skills/engg-debug/SKILL.md)**         | Diagnostics     | Scientific debugging & profiling loop (Reproduce → Measure → Hypothesize → Isolate → Root-Cause Fix → Regression Test).                                                           | Hunting races, memory leaks, p99 spikes, Web Vitals jank, mobile ANRs, or game frame drops.    |
+| 11  | **[`engg-data`](skills/engg-data/SKILL.md)**           | Persistence     | Schema modeling, index design, `EXPLAIN ANALYZE` verification, throttled backfills, and **zero-downtime expand-and-contract migrations**.                                         | Touching databases, writing migrations, or eliminating slow queries and lock hazards.          |
+| 12  | **[`engg-ship`](skills/engg-ship/SKILL.md)**           | Release & Ops   | Hardened CI quality gates, non-root immutable containers, declarative IaC, observability/SLOs, Production Readiness Review, rollbacks, and atomic commits.                        | Setting up CI/CD, containerizing, deploying safely, or writing rollback runbooks.              |
 
 ---
 
@@ -88,7 +90,7 @@ Domain-specific profiles live inside `references/` so the exact same skills adap
 
 ## How I Use It (Real Workflows & Why)
 
-I don't invoke all 11 skills on every task—I compose them into **4 repeatable loops** depending on what I'm doing. (See [`docs/WORKFLOWS.md`](docs/WORKFLOWS.md) for the complete prompt cookbook.)
+I don't invoke all 12 skills on every task—I compose them into **4 repeatable loops** depending on what I'm doing. (See [`docs/WORKFLOWS.md`](docs/WORKFLOWS.md) for the complete prompt cookbook.)
 
 ### 1. Accelerating an In-Progress Project (Roadmap Grill → Ship)
 
@@ -119,7 +121,7 @@ I don't invoke all 11 skills on every task—I compose them into **4 repeatable 
 
 > **Why:** Refactors without safety-net tests break production, and plans drafted by other models often hide missing trust boundaries, unbounded queries, or stale API versions.
 
-- **Existing repo/module:** `/engg-audit Run Mode B on src/payments/ — give me a 6-pillar scorecard, severity-ranked findings, and a strangler-fig hardening plan.`
+- **Existing repo/module:** `/engg-deep-audit Audit this repo against .engg/architecture.yaml, layer by layer. Give me the scorecard, strip list, move list, and remediation waves.`
 - **External spec/plan:** `/engg-audit Run Mode C on docs/proposal.md — flag every missing budget, security gap, stale tech claim, and over-engineered piece with a Tightened Spec Delta.`
 
 ### 4. Daily Specialist Loops
@@ -187,11 +189,11 @@ _Options: `-Copy`, `-DryRun`, `-Uninstall` (same behaviour as the shell installe
   1. Verify install: type `/` to browse available skills, or ask `"What skills do you have?"`.
   2. Invoke explicitly with slash commands (`/engg-roadmap`, `/engg-build`, `/engg-audit`) or let Claude auto-activate them from natural requests.
 - **Antigravity CLI:**
-  1. Start a session and run `/skills` to confirm all 11 `engg-*` skills are loaded.
+  1. Start a session and run `/skills` to confirm all 12 `engg-*` skills are loaded.
   2. Invoke via `/engg-roadmap`, `/engg-plan`, `/engg-build`, etc., or reference the skill by name.
 - **Antigravity IDE:**
   1. Open your workspace (restart the window once after a fresh global install).
-  2. Type `/` in the Agent Panel to browse and trigger any `engg-*` skill directly—or ask naturally (e.g., _"Use engg-audit Mode B to harden this service"_).
+  2. Type `/` in the Agent Panel to browse and trigger any `engg-*` skill directly—or ask naturally (e.g., _"Use engg-deep-audit to audit this service layer by layer"_).
 - **Cursor / Codex CLI / GitHub Copilot / OpenCode:**
   - Run `./install.sh --project /path/to/your-project`—all modern open-spec agents automatically discover `<repo>/.agents/skills/<skill>/SKILL.md`.
 - **Any Web LLM (Chat UI without filesystem skill discovery):**
@@ -242,7 +244,8 @@ engg-skills-suite/
 │   ├── engg-plan/                    # MVP-first Waves & Atomic Chunk decomposition
 │   ├── engg-build/                   # Strict TDD (5-category Test Matrix) chunk builder
 │   ├── engg-extend/                  # Vertical slices & contract-tested swappable adapters
-│   ├── engg-audit/                   # Adversarial P0-P3 audit (PR, brownfield repo, external spec)
+│   ├── engg-audit/                   # Adversarial P0-P3 audit of a diff/PR or an external spec
+│   ├── engg-deep-audit/              # Tool-driven, layer-by-layer audit of a whole codebase
 │   ├── engg-research/                # Zero-memory-guessing live docs & version pinning
 │   ├── engg-debug/                   # Evidence-driven debugging & performance profiling
 │   ├── engg-data/                    # Schema design, query plans & zero-downtime migrations
