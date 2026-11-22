@@ -86,8 +86,8 @@ function Copy-SkillFolder([string]$Source, [string]$Dest) {
 }
 
 # Links Dest to Source: a symbolic link if permitted, otherwise a junction (absolute path).
-function New-SkillLink([string]$Source, [string]$Dest, [string]$RelativeTarget) {
-  if ($Copy) { Copy-SkillFolder $Source $Dest; return }
+function New-SkillLink([string]$Source, [string]$Dest, [string]$RelativeTarget, [bool]$AsCopy) {
+  if ($AsCopy) { Copy-SkillFolder $Source $Dest; return }
   $target = $Source
   if ($RelativeTarget) { $target = $RelativeTarget }
   Write-Step "link $Dest -> $target"
@@ -150,7 +150,7 @@ foreach ($skill in $Skills) {
     $relative = $null
     # Platform separator: Windows symlinks with "/" in a relative target do not resolve reliably.
     if ($UseRelative) { $relative = [IO.Path]::Combine("..", "..", ".agents", "skills", $skill) }
-    New-SkillLink $canonical $dest $relative
+    New-SkillLink -Source $canonical -Dest $dest -RelativeTarget $relative -AsCopy $Copy.IsPresent
   }
   Write-Host "Installed: $skill"
 }
