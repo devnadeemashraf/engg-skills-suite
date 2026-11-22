@@ -42,7 +42,7 @@ Eliminate hallucinated APIs, stale package versions, deprecated flags, and suppl
    - Present a compact 2–3 option comparison matrix (Maturity, Performance/Size, License, Security/Maintenance, Ecosystem Fit) and make ONE decisive recommendation.
 4. **Apply Strict Pinning:**
    - Pin exact versions in the project's central dependency catalog/manifest + commit updated lockfile.
-   - Pin container base images by immutable SHA256 digest (`image:tag@sha256:...`) and CI actions by full commit SHA, resolving the SHA from the tag live (`git ls-remote https://github.com/<owner>/<repo> refs/tags/<tag>`).
+   - Pin container base images by immutable SHA256 digest (`image:tag@sha256:...`) and CI actions by full commit SHA, resolving the SHA from the tag live (`git ls-remote https://github.com/<owner>/<repo> 'refs/tags/<tag>*'`). For an annotated tag, use the `^{}` line, which is the commit; the other line is the tag object.
    - Run the ecosystem's built-in vulnerability/license audit command.
 5. **Emit a dated Research Brief** (template in `references/version-pinning-policy.md`): verified versions, the date checked, a source link for every fact, breaking-change notes, and upgrade constraints. Downstream skills (`engg-architect`, `engg-build`, `engg-extend`, `engg-ship`) work from the brief, not from memory. Mark anything you couldn't verify as **unverified**; never present it as fact.
 

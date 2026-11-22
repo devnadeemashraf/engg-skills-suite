@@ -20,7 +20,7 @@ Before adding ANY third-party dependency, verify:
 - **Go:** `go list -m -versions <mod>`, `govulncheck ./...`
 - **Rust:** `cargo info <crate>`, `cargo audit`, `cargo deny check`
 - **Any ecosystem:** `osv-scanner scan source -r .` (exit 128 means no lockfiles were found)
-- **CI actions:** `gh release view -R <owner>/<repo> --json tagName`, then `git ls-remote https://github.com/<owner>/<repo> refs/tags/<tag>` for the SHA
+- **CI actions:** `gh release view -R <owner>/<repo> --json tagName`, then `git ls-remote https://github.com/<owner>/<repo> 'refs/tags/<tag>*'` for the SHA (for annotated tags take the `^{}` line: the commit, not the tag object)
 - **Containers / IaC:** `grype` or digest-pinned `trivy image`, `terraform providers lock`, `checkov`
 
 ## 4. Research Brief Template
