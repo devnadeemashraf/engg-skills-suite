@@ -1,0 +1,1 @@
+{ "name": "fixture-shop-ts", "private": true, "dependencies": { "zod": "1.0.0" } }
