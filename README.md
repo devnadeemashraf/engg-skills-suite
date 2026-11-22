@@ -24,7 +24,7 @@ This repository packages my personal engineering operating system into **11 port
 - **Timeless Engineering Design:** Strict **SOLID**, **DRY** (knowledge, not coincidental code), **KISS**, **ATOMIC** (modular composition, atomic state transitions, atomic commits), and **Hexagonal / Ports & Adapters** dependency flow.
 - **Five Non-Negotiable Production Invariants:** Explicit Contracts First, Defense-in-Depth Security, Bounded Everything (timeouts, pools, payloads, memory, frame budgets), Observable by Default, and Graceful Lifecycle.
 - **Zero Premature Code & Zero Rubber-Stamping:** Architecture and roadmaps get grilled _before_ coding; tests get written _before_ implementation; every diff gets adversarially audited (`P0`–`P3`) _before_ commit.
-- **Progressive Disclosure for Speed & Token Efficiency:** Every `SKILL.md` stays lean (<80 lines). Heavy grill banks, 5-category test matrices, domain profiles, and audit checklists live in `references/` and load strictly on demand.
+- **Progressive Disclosure for Speed & Token Efficiency:** Every `SKILL.md` stays lean (under 150 lines, enforced by the validator). Heavy grill banks, 5-category test matrices, domain profiles, and audit checklists live in `references/` and load strictly on demand.
 - **100% Vendor-Neutral & Model-Agnostic:** Built strictly on the open `agentskills.io` specification—works identically with Claude Code CLI, Antigravity CLI, Antigravity IDE, Codex, Cursor, GitHub Copilot, OpenCode, or any web LLM.
 
 ---
@@ -151,7 +151,7 @@ I don't invoke all 11 skills on every task—I compose them into **4 repeatable 
 #### macOS / Linux
 
 ```bash
-git clone https://github.com/<your-username>/engg-skills-suite.git
+git clone https://github.com/devnadeemashraf/engg-skills-suite.git
 cd engg-skills-suite
 chmod +x install.sh
 
@@ -162,27 +162,29 @@ chmod +x install.sh
 ./install.sh --project /path/to/your-project
 ```
 
-_(Pass `--copy` if your environment or Git workflow prefers file copies over symlinks.)_
+_Options: `--copy` (copy files instead of symlinking), `--dry-run` (show what would change), `--uninstall` (remove only this suite's skills; anything else in those folders is left alone)._
 
 #### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/<your-username>/engg-skills-suite.git
+git clone https://github.com/devnadeemashraf/engg-skills-suite.git
 cd engg-skills-suite
 
 # Option 1: Global install
 .\install.ps1 -Scope Global
 
 # Option 2: Project-scoped install
-.\install.ps1 -Scope Project -ProjectPath "C:\path	o\your-project"
+.\install.ps1 -Scope Project -ProjectPath "C:\path\to\your-project"
 ```
+
+_Options: `-Copy`, `-DryRun`, `-Uninstall` (same behaviour as the shell installer). Links are symbolic links when Windows allows them (Developer Mode or admin), otherwise directory junctions, which need no special rights. On Windows, use `install.ps1` rather than `install.sh` under Git Bash: Git Bash's `ln -s` silently makes copies unless native symlinks are enabled._
 
 ---
 
 ### How to Use in Your Favorite IDE / CLI
 
 - **Claude Code CLI:**
-  1. Verify install: run `claude skills list` or ask `"What skills do you have?"`.
+  1. Verify install: type `/` to browse available skills, or ask `"What skills do you have?"`.
   2. Invoke explicitly with slash commands (`/engg-roadmap`, `/engg-build`, `/engg-audit`) or let Claude auto-activate them from natural requests.
 - **Antigravity CLI:**
   1. Start a session and run `/skills` to confirm all 11 `engg-*` skills are loaded.
@@ -201,7 +203,7 @@ cd engg-skills-suite
 
 ```text
 engg-skills-suite/
-├── .github/workflows/validate.yml   # Automated CI suite validation on every push & PR
+├── .github/workflows/validate.yml   # CI: validator, tests, linters, installers on 3 OSes
 ├── docs/
 │   └── WORKFLOWS.md                 # End-to-end prompt recipes & chaining patterns
 ├── skills/
@@ -218,7 +220,9 @@ engg-skills-suite/
 │   └── engg-ship/                    # CI/CD, IaC, containers, PRR & safe rollouts
 ├── install.sh                       # macOS / Linux installer (Global & Project)
 ├── install.ps1                      # Windows PowerShell installer (Global & Project)
-├── validate_suite.py                # Automated open-spec & quality gate validator
+├── tools/validate_suite.py          # Agent Skills spec & suite-rule validator
+├── tools/pin_requirements.py        # Regenerates the hash-pinned requirements files
+├── tests/                           # Validator tests + installer smoke tests
 ├── CONTRIBUTING.md                  # Authoring standards for extending the suite
 └── LICENSE                          # Apache-2.0
 ```
@@ -227,11 +231,14 @@ engg-skills-suite/
 
 ## Validation & Quality Gates
 
-Before pushing changes to this repository, run the built-in validator to enforce `agentskills.io` compliance, frontmatter hygiene, line budgets, broken-reference checks, and strict vendor neutrality across all 11 skills:
+Before pushing changes, run the validator and tests. The validator checks `agentskills.io` compliance (frontmatter parsed as real YAML, field limits, name matches folder), the line budget, resource files (broken, nested, or never referenced), self-contained skill folders, and vendor neutrality:
 
 ```bash
-python3 validate_suite.py
-bash -n install.sh
+python -m venv .venv && . .venv/bin/activate          # Windows: .venv\Scripts\activate
+python -m pip install --require-hashes -r requirements-dev.txt
+python tools/validate_suite.py
+python -m pytest -q
+bash tests/installer_smoke.sh                         # Windows: .\tests\installer_smoke.ps1
 ```
 
-GitHub Actions automatically runs these checks on every push and pull request via [`.github/workflows/validate.yml`](.github/workflows/validate.yml).
+GitHub Actions runs all of this on every push and pull request, plus shellcheck, actionlint, zizmor, PSScriptAnalyzer, and installer smoke tests on Linux, macOS, and Windows. Every action is pinned to a commit SHA and every Python dependency is hash-pinned. See [`.github/workflows/validate.yml`](.github/workflows/validate.yml).
