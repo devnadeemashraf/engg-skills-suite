@@ -25,6 +25,7 @@ Design durable, high-performance data models and zero-downtime schema evolutions
 3. **Zero-downtime expand-and-contract:** Never ship a single-step destructive migration (rename/drop column, tighten type, blocking table rewrite) against a live system. Always split into backward-compatible Expand -> Backfill -> Cutover -> Contract phases.
 4. **Verify real query plans:** Every non-trivial query or new index must be validated with realistic cardinality via `EXPLAIN (ANALYZE, BUFFERS)` (or datastore equivalent).
 5. **Bounded, idempotent backfills:** Data migrations must execute in throttled, resumable, idempotent batches—never one giant locking transaction.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 

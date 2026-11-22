@@ -25,6 +25,7 @@ Ship software reliably, repeatably, and reversibly—with hardened build pipelin
 3. **Every rollout must have a tested rollback:** Never ship a deployment, feature flag flip, or infra change without an explicit, fast rollback path verified beforehand.
 4. **Least-privilege & zero plaintext secrets:** Use OIDC/workload identity, scoped IAM roles, secret managers, non-root containers, and automated secret scanning in CI.
 5. **Atomic Conventional Commits:** Group changes cleanly (`feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`) with concise imperative subjects explaining _why_.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 

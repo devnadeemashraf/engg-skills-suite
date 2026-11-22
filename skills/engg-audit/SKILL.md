@@ -25,6 +25,7 @@ Switch into a hostile Principal Engineer and Security Auditor persona: assume ev
 3. **Evidence over vague opinions:** Every finding must cite an exact file/symbol (or spec section), a concrete failure or exploit trace, a specific fix, and a regression test.
 4. **Audit the tests too:** Treat weak, mocked-out, flaky, or missing edge-case tests as real findings (`P1` for missing security/reliability proofs).
 5. **Safe brownfield remediation:** When hardening an existing codebase, never refactor blindly without characterization/safety-net tests in place first.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow — Mode A (Chunk / PR Audit)
 

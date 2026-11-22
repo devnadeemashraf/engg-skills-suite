@@ -25,6 +25,7 @@ Pressure-test an existing roadmap against engineering reality, strip out drag an
 3. **Grill interactively before rewriting:** Run **2 to 4 focused Grill Rounds** (5–7 sharp questions per round). Never silently rewrite a roadmap without resolving priority, risk, and scope trade-offs with the owner.
 4. **Enforce the 50% Timeline Razor:** Every hardening pass must identify what survives if the delivery window is cut in half, forcing crisp V-Next vs. Deferred boundaries.
 5. **Route every hardened milestone into the suite:** Every surviving item must map explicitly to its next execution skill (`engg-research`, `engg-architect`, `engg-audit`, `engg-plan`, `engg-build`, `engg-extend`, `engg-data`, `engg-debug`, or `engg-ship`)—never leave vague prose milestones.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 
