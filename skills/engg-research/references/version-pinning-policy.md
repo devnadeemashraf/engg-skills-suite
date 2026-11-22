@@ -15,8 +15,27 @@ Before adding ANY third-party dependency, verify:
 5. **Footprint:** Acceptable binary/bundle size, cold-start cost, and transitive dependency count?
 
 ## 3. Ecosystem Quick-Verification Commands
-- **JS/TS:** `npm view <pkg> dist-tags`, `pnpm audit` / `npm audit`, `npm ci` / `pnpm install --frozen-lockfile`
-- **Python:** `uv lock --locked`, `pip-audit`
+- **JS/TS:** `npm view <pkg> version time engines peerDependencies`, `npm audit`, `npm ci --ignore-scripts` / `pnpm install --frozen-lockfile`
+- **Python:** `pip index versions <pkg>`, `uv lock --locked`, `pip-audit`; install with `--require-hashes` from a hash-pinned file
 - **Go:** `go list -m -versions <mod>`, `govulncheck ./...`
 - **Rust:** `cargo info <crate>`, `cargo audit`, `cargo deny check`
-- **Containers / IaC:** `trivy image`, `terraform providers lock`, `checkov` / `tfsec`
+- **Any ecosystem:** `osv-scanner scan source -r .` (exit 128 means no lockfiles were found)
+- **CI actions:** `gh release view -R <owner>/<repo> --json tagName`, then `git ls-remote https://github.com/<owner>/<repo> refs/tags/<tag>` for the SHA
+- **Containers / IaC:** `grype` or digest-pinned `trivy image`, `terraform providers lock`, `checkov`
+
+## 4. Research Brief Template
+
+```markdown
+# Research Brief: <question>   (verified <YYYY-MM-DD>)
+
+| Item | Chosen | Why | Source |
+|---|---|---|---|
+| <package> | <exact version> | <one line> | <registry or release URL> |
+
+- **Compatibility:** <engine/peer ranges checked, and any excluded versions>
+- **Health:** <archived? last release? Scorecard? licence>
+- **Vulnerabilities:** <OSV / audit result for the exact version>
+- **Breaking changes vs. current:** <list, with changelog links>
+- **Pins written:** <lockfile / digest / SHA lines changed>
+- **Unverified:** <anything that couldn't be confirmed, and why>
+```
