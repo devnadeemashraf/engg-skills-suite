@@ -1,0 +1,11 @@
+# Which shared files each skill receives. tools/sync_shared.py copies them into skills/<skill>/<path>
+# so every skill stays self-contained and installable on its own.
+#
+# Edit files here in shared/, never the copies inside skills/, then run:
+#   python tools/sync_shared.py
+# CI runs `python tools/sync_shared.py --check` and fails if any copy differs or is stale.
+groups:
+  constitution:
+    files:
+      - references/engineering-constitution.md
+    skills: [engg-architect, engg-audit, engg-build, engg-extend, engg-roadmap]
