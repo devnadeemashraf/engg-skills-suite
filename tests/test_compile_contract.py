@@ -17,6 +17,8 @@ import pytest
 import yaml
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+# Importing skill scripts must not leave __pycache__ inside skill folders (installers copy them).
+sys.dont_write_bytecode = True
 sys.path.insert(0, str(REPO_ROOT / "shared" / "scripts"))
 
 import compile_contract as cc  # noqa: E402

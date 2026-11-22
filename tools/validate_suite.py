@@ -123,11 +123,16 @@ def check_references(skill: str, sdir: Path, body: str) -> list[str]:
         root = sdir / res_dir
         if not root.is_dir():
             continue
-        for fpath in sorted(p for p in root.rglob("*") if p.is_file()):
+        for fpath in sorted(p for p in root.rglob("*") if p.is_file() and not is_cache(p)):
             rel = fpath.relative_to(sdir).as_posix()
             if rel not in mentioned:
                 errors.append(f"{skill}: '{rel}' is never referenced from SKILL.md, so agents will never load it")
     return errors
+
+
+def is_cache(path: Path) -> bool:
+    """Interpreter caches are local build artefacts (git-ignored), not skill resources."""
+    return "__pycache__" in path.parts or path.suffix in {".pyc", ".pyo"}
 
 
 def check_brand_names(skills_root: Path, sdir: Path) -> list[str]:
