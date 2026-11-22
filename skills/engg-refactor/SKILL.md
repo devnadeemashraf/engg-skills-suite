@@ -29,6 +29,7 @@ Turn a messy codebase into a clean one without breaking it. Every step is small,
 5. **Never weaken a gate to get green:** no skipped or deleted tests, no loosened contract, no raised thresholds, no new suppressions. If a gate is wrong, raise it with the owner.
 6. **One transformation kind per commit,** each passing the gates: tests, typecheck, linter, compiled architecture enforcer (`scripts/compile_contract.py`, schema in `references/architecture-contract.md`), ratchet.
 7. **Use tools, with consent.** Prefer automated refactors (LSP rename and move, `ast-grep` rewrites) over hand edits. Check what's installed with `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`), pick from `references/toolchain.md`, and follow `references/tool-consent.md` before installing.
+8. **Refactors respect the baseline:** cleanup moves code toward the existing contract. It never redesigns the architecture or swaps tools unless `.engg/delivery.yaml` says `baseline: redo` (`references/delivery-modes.md`). In `mvp-first`, refactor only what blocks the `core_flow` or the current wave.
 
 ## Workflow
 

@@ -27,6 +27,7 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
 5. **Enforce design invariants:** Every EDD must explicitly codify SOLID, DRY, KISS, ATOMIC boundaries, Hexagonal/Clean dependency flow, explicit contracts, security controls, and hard resource/performance budgets.
 6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 7. **Architecture is a machine-checked contract, not just a diagram:** every locked EDD ships with `.engg/architecture.yaml` written to the schema in `references/architecture-contract.md`. Compile it with `scripts/compile_contract.py` and never hand-write enforcer configs.
+8. **Design only what isn't fixed:** with `baseline: existing` (`references/delivery-modes.md`), the current architecture and tooling are the baseline. Write the contract as it is and extend it; never redesign unless the user explicitly asks (`baseline: redo`).
 
 ## Workflow
 

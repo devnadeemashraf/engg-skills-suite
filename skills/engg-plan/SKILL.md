@@ -27,6 +27,7 @@ Break complex systems, features, or remediation backlogs into small, vertical, i
 5. **Explicit exit criteria:** Every chunk must define concrete **Definition of Done (DoD)** checks and **Key Edge Cases to Prove in Tests**.
 6. **Tier every chunk; gates are commands.** Assign each chunk a risk tier (T0–T3). Its gates are the exact commands that must exit 0 for that tier, never prose like "tests pass". When unsure, pick the higher tier.
 7. **Every chunk is reversible and measurable.** State its rollback (usually "revert the commit"; migrations and flags need more), and for brownfield work its **ratchet delta**: which baseline violations it removes. A chunk that can't shrink the baseline or ship a verified behaviour is not a chunk.
+8. **Plan to the delivery mode:** read `.engg/delivery.yaml`, or ask the question in `references/delivery-modes.md` first. The mode sets Wave 1, chunk size, the default tier and what goes to the backlog. Record the mode and baseline at the top of the plan.
 
 ## Workflow
 

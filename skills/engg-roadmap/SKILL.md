@@ -26,6 +26,7 @@ Pressure-test an existing roadmap against engineering reality, strip out drag an
 4. **Enforce the 50% Timeline Razor:** Every hardening pass must identify what survives if the delivery window is cut in half, forcing crisp V-Next vs. Deferred boundaries.
 5. **Route every hardened milestone into the suite:** Every surviving item must map explicitly to its next execution skill (`engg-research`, `engg-architect`, `engg-deep-audit`, `engg-audit`, `engg-plan`, `engg-build`, `engg-extend`, `engg-refactor`, `engg-data`, `engg-debug`, or `engg-ship`)—never leave vague prose milestones.
 6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+7. **Respect the delivery mode and the baseline:** read `.engg/delivery.yaml`, or ask the question in `references/delivery-modes.md` if it's missing. In `mvp-first`, Milestone 1 delivers the `core_flow`, and anything that doesn't serve it moves to a later milestone or the backlog. With `baseline: existing`, never schedule redesigns, re-layouts or tool swaps unless the user asked for them.
 
 ## Workflow
 

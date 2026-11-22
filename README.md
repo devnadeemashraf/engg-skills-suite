@@ -98,6 +98,19 @@ Each request has exactly one skill. When two seem to fit, the right column decid
 
 ---
 
+## Delivery Modes: Ask First, Then Stay in Lane
+
+Before planning or building, the skills ask what kind of result you want, and record it in `.engg/delivery.yaml` so no later session guesses:
+
+| Mode | You get | Best when |
+|---|---|---|
+| **`mvp-first`** | The core flow working end-to-end quickly, with everything critical (security, contract, tests at tier, CI) done properly. Then small increments: features, improvements, fixes. | The idea is unproven, there's a demo or deadline, or the scope is still moving |
+| **`full-sequence`** | Every planned part built one by one, each complete and polished before the next | Fixed, well-understood scope; libraries, platforms, infrastructure |
+
+**The baseline rule:** if a project already has an architecture and tooling, they're **fixed**. Skills build within them, and log improvements to a backlog instead of redesigning, re-laying-out or swapping tools. Only an explicit "redo it" (`baseline: redo`) opens a redesign. Neither mode ever relaxes security, the architecture contract, tests-first at the risk tier, or the Evidence Protocol: `mvp-first` cuts scope, never quality. Full rules: [`shared/references/delivery-modes.md`](shared/references/delivery-modes.md).
+
+---
+
 ## Supported Engineering Surfaces
 
 Domain-specific profiles live inside `references/` so the exact same skills adapt natively across every stack:

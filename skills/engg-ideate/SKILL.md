@@ -24,6 +24,7 @@ Transform raw product or technical concepts into a clear, feasibility-tested **P
 2. **Load rubric before facilitating:** Read `references/ideation-rubric.md` before starting the framing session.
 3. **Challenge assumptions candidly:** Surface hidden risks, market/technical blind spots, and build-vs-buy alternatives immediately rather than rubber-stamping every idea.
 4. **Enforce sharp V1 boundaries:** Every Project Charter must contain explicit **Out-of-Scope / Non-Goals** to prevent scope creep.
+5. **Settle the delivery mode early:** before writing the charter, ask the delivery-mode question in `references/delivery-modes.md` and record the answer in the charter (and in `.engg/delivery.yaml` once a repository exists). For `mvp-first`, name the one `core_flow` the V1 slice must demonstrate.
 
 ## Workflow
 

@@ -4,6 +4,18 @@ Copy-paste recipes for getting maximum velocity out of `engg-skills-suite` acros
 
 ---
 
+## Recipe 0: Choose the Delivery Mode (once per effort)
+
+```text
+/engg-plan Before planning, ask me the delivery-mode question (mvp-first or full-sequence) and confirm the baseline, then record both in .engg/delivery.yaml.
+```
+
+- **New idea or tight deadline:** `mvp-first` with `core_flow` set to the one journey that must work. Wave 1 is that flow plus the critical items; everything else is an increment.
+- **Existing project, next feature:** keep the recorded mode; `baseline: existing` means the architecture and tools are fixed.
+- **Starting over on purpose:** say so: `baseline: redo` is the only way the skills will redesign.
+
+---
+
 ## Recipe 1: Grill & Harden an In-Progress Product Roadmap
 
 **Goal:** Align `docs/ROADMAP.md` with actual repository reality, cut drag, pull high-risk items forward, and route every milestone to the right execution skill.

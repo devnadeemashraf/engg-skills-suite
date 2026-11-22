@@ -1,5 +1,17 @@
 # Chunk Specification Template & Sizing Rules
 
+## Plan Header (top of every plan)
+
+```markdown
+**Delivery mode:** mvp-first | full-sequence   (from .engg/delivery.yaml, decided <date>: <reason>)
+**Baseline:** greenfield | existing | redo   (existing = architecture and tooling are fixed; see delivery-modes)
+**Core flow (mvp-first):** <step -> step -> step>   Wave 1 is done when this works end-to-end with CI green.
+```
+
+## Backlog (bottom of every plan)
+
+Work noticed but outside the mode or the current wave: deferred features, polish, refactors of code the core flow doesn't need, and baseline improvements nobody asked for. One line each: what, why, and which finding or chunk it came from. Nothing moves from the backlog into a chunk without the user agreeing.
+
 ## Chunk Sizing Heuristic
 - **Ideal scope:** 1 cohesive capability, 1–5 production files + matching test files, cleanly verifiable in one Red -> Green -> Refactor -> Audit cycle.
 - **Split trigger:** split the chunk if it needs more than one major architectural decision, modifies unrelated bounded contexts, mixes a structural refactor with a behaviour change, or can't be summarized in one Conventional Commit title.
