@@ -108,6 +108,19 @@ def test_hotspot_ranking(mapped: dict) -> None:
     assert mapped["hotspots"][0] == "src/orders/app/place-order.ts"
 
 
+def test_test_files_are_ranked_apart_from_production(tmp_path: Path) -> None:
+    run = tmp_path / "run"
+    shutil.copytree(REPO_ROOT / "tests/fixtures/deep-audit-raw/ts-clean-api", run / "raw")
+    clean = REPO_ROOT / "evals/fixtures/ts-clean-api"
+    assert build_map.main(["--run-dir", str(run), "--contract", str(clean / ".engg/architecture.yaml"),
+                           "--repo-root", str(clean)]) == 0
+    m = json.loads((run / "map.json").read_text(encoding="utf-8"))
+    test_file = "src/orders/app/place-order.test.ts"
+    assert test_file not in m["hotspots"]
+    assert m["test_hotspots"] == [test_file]
+    assert "## Hotspots, test code" in (run / "map.md").read_text(encoding="utf-8")
+
+
 def test_units_split_at_line_budget(run_dir: Path) -> None:
     assert build_map.main(["--run-dir", str(run_dir), "--contract", str(CONTRACT),
                            "--repo-root", str(FIXTURE), "--max-unit-lines", "20"]) == 0
@@ -285,3 +298,31 @@ def test_clean_fixture_map_raises_no_alarms(tmp_path: Path) -> None:
     assert m["dead_file_candidates"] == []
     assert m["unreferenced_symbols"] == []  # compose() in main.ts is an entry point, not dead code
     assert m["duplicates"] == [] and m["cycles"] == []
+
+
+def test_skip_records_a_reason_and_report_says_partial(ready: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    assert ledger.main(["skip", "--run-dir", str(ready), "--unit", "U002", "--reason", "short"]) == 2
+    assert ledger.main(["skip", "--run-dir", str(ready), "--unit", "U999", "--reason", "a long enough reason"]) == 2
+    assert ledger.main(["skip", "--run-dir", str(ready), "--unit", "U002",
+                        "--reason", "Tooling only; covered by tool signals, not line-read."]) == 0
+    assert [u["status"] for u in ledger.load(ready)][1] == "skipped"
+    # next never hands out a skipped unit
+    for u in ledger.load(ready):
+        if u["id"] not in ("U002",):
+            (ready / "findings" / f"{u['id']}.yaml").write_text("[]\n", encoding="utf-8")
+            assert ledger.main(["done", "--run-dir", str(ready), "--unit", u["id"], "--summary", "Reviewed: clean."]) == 0
+    capsys.readouterr()
+    assert ledger.main(["next", "--run-dir", str(ready)]) == 0
+    assert "every unit is done" in capsys.readouterr().out
+    assert ledger.main(["report", "--run-dir", str(ready)]) == 0
+    text = (ready / "report-data.md").read_text(encoding="utf-8")
+    assert "**INCOMPLETE:**" not in text and "**PARTIAL:** 1 unit(s)" in text
+    assert "**U002**" in text.split("## Units not reviewed (skipped on purpose)", 1)[1]
+    assert ledger.main(["status", "--run-dir", str(ready)]) == 0
+    assert "SKIP" in capsys.readouterr().out
+
+
+def test_a_reviewed_unit_cannot_be_skipped(ready: Path) -> None:
+    (ready / "findings" / "U001.yaml").write_text("[]\n", encoding="utf-8")
+    assert ledger.main(["done", "--run-dir", str(ready), "--unit", "U001", "--summary", "Reviewed: clean."]) == 0
+    assert ledger.main(["skip", "--run-dir", str(ready), "--unit", "U001", "--reason", "changed my mind about it"]) == 1

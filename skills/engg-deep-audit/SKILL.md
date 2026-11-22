@@ -57,6 +57,7 @@ Tools build the map; you judge only what tools can't. Reading thousands of lines
 2. Review the unit with `references/unit-checklist.md`, reading only the listed files.
 3. Write `$RUN/findings/<unit>.yaml` (`[]` if clean).
 4. `python scripts/ledger.py done --run-dir $RUN --unit <id> --summary "..."`. If it rejects the findings, fix them and rerun. Then drop the unit's code from working context.
+5. A unit you decide not to read line by line (for example, test code judged by tool signals only) is recorded with `ledger.py skip --unit <id> --reason "..."`, never left pending or marked done. The report then says PARTIAL and lists every skipped unit with its reason.
 
 **Phase 5: Layer synthesis**
 - For each layer, read `ledger.py summaries --layer <name>`, not the code.
