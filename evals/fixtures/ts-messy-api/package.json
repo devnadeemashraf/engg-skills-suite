@@ -1,0 +1,6 @@
+{
+  "name": "messy-api",
+  "private": true,
+  "type": "module",
+  "description": "Eval fixture with planted defects. Not runnable; see evals/expected/ts-messy-api.yaml."
+}

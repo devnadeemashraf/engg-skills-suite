@@ -1,0 +1,6 @@
+{
+  "name": "clean-api",
+  "private": true,
+  "type": "module",
+  "description": "Eval fixture: the clean twin of ts-messy-api. An audit should raise no P0 or P1 findings."
+}
