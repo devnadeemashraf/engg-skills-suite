@@ -199,13 +199,28 @@ _Options: `-Copy`, `-DryRun`, `-Uninstall` (same behaviour as the shell installe
 
 ---
 
+## Open-Source Toolchain (Asked, Never Assumed)
+
+Skills lean on free, open-source tools wherever a tool is faster, cheaper in tokens, or more accurate than reading code by hand. Examples: a code knowledge graph (graphify), compact web reading (only-cli), architecture rule checkers, dead-code and duplication finders, secret and vulnerability scanners.
+
+- **Registry:** [`shared/references/toolchain.md`](shared/references/toolchain.md) lists each tool's job, licence, user-scoped install command, and what is lost without it.
+- **Detection:** `toolcheck.sh` / `toolcheck.ps1` report what's installed. They never install anything.
+- **Consent:** [`shared/references/tool-consent.md`](shared/references/tool-consent.md). A skill asks once, explains why each tool helps and what data (if any) leaves your machine, verifies the package live, prefers easy-to-undo installs, and records versions in `.engg/toolchain.lock`.
+
+---
+
 ## Repository Structure
 
 ```text
 engg-skills-suite/
 ├── .github/workflows/validate.yml   # CI: validator, tests, linters, installers on 3 OSes
 ├── docs/
-│   └── WORKFLOWS.md                 # End-to-end prompt recipes & chaining patterns
+│   ├── WORKFLOWS.md                 # End-to-end prompt recipes & chaining patterns
+│   └── V2_PLAN.md                   # The v2 refactor plan and rollout phases
+├── shared/                          # Single source of truth for files several skills use
+│   ├── manifest.yaml                # Which skills receive which shared files
+│   ├── references/                  # Constitution, toolchain registry, tool consent protocol
+│   └── scripts/                     # toolcheck.sh / toolcheck.ps1 (read-only tool detection)
 ├── skills/
 │   ├── engg-ideate/                  # Idea framing & Project Charter
 │   ├── engg-roadmap/                 # Existing roadmap grilling, reality-check & routing
@@ -221,8 +236,9 @@ engg-skills-suite/
 ├── install.sh                       # macOS / Linux installer (Global & Project)
 ├── install.ps1                      # Windows PowerShell installer (Global & Project)
 ├── tools/validate_suite.py          # Agent Skills spec & suite-rule validator
+├── tools/sync_shared.py             # Copies shared/ into skills; --check fails CI on drift
 ├── tools/pin_requirements.py        # Regenerates the hash-pinned requirements files
-├── tests/                           # Validator tests + installer smoke tests
+├── tests/                           # Validator, sync & toolcheck tests + installer smoke tests
 ├── CONTRIBUTING.md                  # Authoring standards for extending the suite
 └── LICENSE                          # Apache-2.0
 ```
@@ -236,6 +252,7 @@ Before pushing changes, run the validator and tests. The validator checks `agent
 ```bash
 python -m venv .venv && . .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install --require-hashes -r requirements-dev.txt
+python tools/sync_shared.py --check
 python tools/validate_suite.py
 python -m pytest -q
 bash tests/installer_smoke.sh                         # Windows: .\tests\installer_smoke.ps1

@@ -21,12 +21,20 @@ Every skill in this repository is held to the same engineering standard it enfor
    - Skills stay genuinely tech-agnostic until the user locks a stack.
 5. **Orthogonal Trigger Scope:**
    - Before adding a skill, confirm it doesn't duplicate or blur the activation boundaries of an existing `engg-*` skill.
+6. **Shared Files Live in `shared/`:**
+   - Files several skills need (the engineering constitution, the toolchain registry, the tool consent protocol, `toolcheck` scripts) are edited **only** in `shared/`. Run `python tools/sync_shared.py` to copy them into the skills listed in `shared/manifest.yaml`.
+   - Never edit a synced copy inside `skills/`. CI runs `python tools/sync_shared.py --check` and fails on any drift _(enforced)_.
+   - A shared file's name is reserved: if a skill isn't assigned that file in the manifest, the sync removes the skill's copy.
+7. **Tools Need Consent:**
+   - Skills may recommend tools from `shared/references/toolchain.md`, but must follow `shared/references/tool-consent.md`: detect with `toolcheck`, ask once with a clear reason, verify the package live, prefer user-scoped installs, and say what accuracy is lost if the user declines.
+   - When adding a tool to the registry, check its licence and maintenance status on its repository, then add it to both `toolcheck.sh` and `toolcheck.ps1` (a test compares the two lists).
 
 ## Local Verification Before Opening a PR
 
 ```bash
 python -m venv .venv && . .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install --require-hashes -r requirements-dev.txt
+python tools/sync_shared.py --check
 python tools/validate_suite.py
 python -m pytest -q
 bash tests/installer_smoke.sh                         # Windows: .\tests\installer_smoke.ps1
