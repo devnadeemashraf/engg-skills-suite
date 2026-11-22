@@ -1,54 +1,62 @@
 ---
 name: engg-ship
-description: Prepares, automates, hardens, and executes production deployments, CI/CD pipelines, Infrastructure-as-Code (IaC), containerization, observability setup, release checklists, and atomic Git commits. Use when setting up CI/CD, writing Dockerfiles or IaC, preparing a release, verifying production readiness, or rolling out and rolling back software safely.
+description: Prepares, automates, hardens, and executes production delivery. Covers CI/CD quality gates (including the architecture contract and violation ratchet), supply-chain security (SHA-pinned actions, workflow linting, SBOMs, SLSA provenance), merge queues, containerization, Infrastructure-as-Code, observability, feature-flagged progressive rollouts with tested rollbacks, DORA delivery metrics, and atomic Git commits. Use when setting up or hardening CI/CD, writing Dockerfiles or IaC, preparing a release, verifying production readiness, or rolling software out and back safely.
 license: Apache-2.0
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---
 
-# Release, Infrastructure & Production Operations Engineer
+# Release, Supply Chain & Production Operations Engineer
 
-Ship software reliably, repeatably, and reversibly—with hardened build pipelines, declarative infrastructure, verifiable observability, and zero-drama rollbacks.
+Ship software reliably, repeatably, and reversibly, with gates that machines enforce, a supply chain an attacker can't quietly rewrite, and rollbacks that have already been tested.
 
 ## When to Use
 
-- Authoring or hardening CI/CD pipelines, Dockerfiles, Kubernetes manifests, Terraform/OpenTofu/Pulumi IaC, or mobile/web/game build & release pipelines.
+- Authoring or hardening CI/CD pipelines, Dockerfiles, Kubernetes manifests, Terraform/OpenTofu/Pulumi IaC, or mobile/web/game release pipelines.
 - Running a pre-launch Production Readiness Review (PRR).
-- Preparing atomic Conventional Commits, changelogs, canary rollouts, or incident rollback runbooks.
+- Setting up merge queues, feature flags, canary rollouts, delivery metrics, or incident rollback runbooks.
 
 ## Non-Negotiable Rules
 
-1. **Read readiness gate first:** Load `references/production-readiness-gate.md` before signing off any release or infra change.
-2. **Immutable, reproducible builds:** Build artifacts once from pinned dependencies and promote the exact same artifact across dev -> staging -> prod (config injected via environment/secret manager, never rebuilt per env).
-3. **Every rollout must have a tested rollback:** Never ship a deployment, feature flag flip, or infra change without an explicit, fast rollback path verified beforehand.
-4. **Least-privilege & zero plaintext secrets:** Use OIDC/workload identity, scoped IAM roles, secret managers, non-root containers, and automated secret scanning in CI.
-5. **Atomic Conventional Commits:** Group changes cleanly (`feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`) with concise imperative subjects explaining _why_.
-6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+1. **Read the readiness gate first:** load `references/production-readiness-gate.md` before signing off any release or infrastructure change. Infrastructure and release changes are risk tier **T3** (`references/engineering-constitution.md`).
+2. **Immutable, reproducible builds:** build once from pinned dependencies and promote the exact same artifact from dev to staging to prod. Config is injected from the environment or a secret manager, never rebuilt per environment.
+3. **Every rollout has a tested rollback:** never ship a deployment, flag flip, or infrastructure change without a fast rollback path that has been exercised beforehand.
+4. **Least privilege, no plaintext secrets:** use OIDC or workload identity, scoped roles, secret managers, non-root containers, and secret scanning in pre-commit and CI.
+5. **Pin every third-party input immutably:**
+   - CI actions by full commit SHA (tag in a comment), container images by digest, dependencies by lockfile.
+   - A tag can be force-pushed: in March 2026, 76 of 77 `trivy-action` tags were rewritten to steal CI secrets (CVE-2026-33634).
+   - Lint workflows with `actionlint` and `zizmor`. Keep pins fresh with Renovate (`helpers:pinGitHubActionDigests`) rather than hand-editing.
+6. **Standards are machine-enforced:** required status checks and branch protection on the default branch, CODEOWNERS for sensitive paths, and in CI the compiled architecture contract plus `scripts/ratchet.py check --require-tight`, so violations can only go down.
+7. **Atomic Conventional Commits:** `feat`, `fix`, `refactor`, `perf`, `test`, `docs`, `build`, `ci`, `chore`, with concise imperative subjects that explain *why*.
+8. **Use the open-source toolchain, with consent:** check what's installed with `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`), pick tools from `references/toolchain.md`, and follow `references/tool-consent.md` before installing anything. Look up every action, image and tool version live through `engg-research`; never from memory.
 
 ## Workflow
 
-1. **CI Quality Gate Pipeline (Fast Fail Order):**
-   - Stage 1 (Seconds): Secret scan, formatting check, strict linter, static typecheck.
-   - Stage 2 (Fast): Unit tests, contract tests, IaC validate/lint.
-   - Stage 3 (Thorough): Integration tests (ephemeral deps), race/sanitizer checks, SAST, dependency/container CVE scan, SBOM generation.
-   - Stage 4 (Artifact): Reproducible immutable build signed/tagged with commit SHA.
-2. **Infrastructure & Packaging Hardening:**
-   - Multi-stage minimal containers (non-root UID, read-only rootfs, dropped capabilities, pinned base image digests, explicit CPU/memory limits).
-   - Modular, declarative IaC with remote locked state, drift detection, and strict environment isolation (separate state/blast radius for staging vs. prod).
-3. **Observability & Alerting Wiring:**
-   - Verify structured logs, core SLIs/SLOs (latency/error/saturation for backend; Web Vitals/JS errors for web; crash-free sessions/ANR for mobile; crash/FPS telemetry for games), dashboards, and symptom-based alerts (alert on user-facing SLO burn, not noisy CPU spikes).
-4. **Progressive Rollout & Verification:**
-   - Execute pre-flight checks against `references/production-readiness-gate.md`.
-   - Roll out progressively (canary / staged rollout / blue-green / feature flag ramp) with automated health/SLO gate checks.
-   - Verify synthetic smoke tests and telemetry after cutover.
-5. **Runbook & Atomic Commit Hygiene:**
-   - Document rollback command, common failure modes, and dashboards in a concise runbook.
-   - Commit cleanly with atomic Conventional Commits and release notes.
+1. **Local and pre-commit (seconds):** formatter, linter, typecheck, secret scan (`gitleaks git --pre-commit --redact`), via lefthook or pre-commit. The same commands run again in CI; hooks are a convenience, not the gate.
+2. **CI quality gates (fail fast):**
+   - **Stage 1, seconds:** secret scan, format check, lint, typecheck, `actionlint` + `zizmor` on workflow changes.
+   - **Stage 2, fast:** unit and contract tests, the compiled architecture enforcer, the ratchet check, IaC validate and lint (`checkov` / `tflint`), Dockerfile lint (`hadolint`).
+   - **Stage 3, thorough:** integration tests against ephemeral dependencies, race and sanitizer runs, SAST, dependency and image vulnerability scans (`osv-scanner`, `grype` or digest-pinned `trivy`), an SBOM (`syft`).
+   - **Stage 4, artifact:** one reproducible build tagged with the commit SHA, with signed provenance. SLSA v1.2 Build L2 or higher, via GitHub artifact attestations (`actions/attest`) or Sigstore `cosign`. Check it with `gh attestation verify` or `cosign verify` before deploying. On GitHub, private repos need Enterprise Cloud for attestations.
+   - **Workflow hygiene:** `permissions: contents: read` by default, widened per job only when needed; `persist-credentials: false` on checkout; no `pull_request_target` with untrusted code.
+3. **Merge discipline:** small, trunk-based pull requests. On busy repositories, a **merge queue** that runs the full gates on the merged result before it lands (on GitHub, CI must also trigger on the `merge_group` event). Run OpenSSF Scorecard on the repository and fix its high-risk checks.
+4. **Packaging and infrastructure:**
+   - Multi-stage minimal containers: non-root UID, read-only root filesystem, dropped capabilities, digest-pinned base images, explicit CPU and memory limits.
+   - Modular declarative IaC with remote locked state, drift detection, and separate state per environment.
+5. **Observability:** structured logs with correlation ids, SLIs and SLOs per surface (latency/errors/saturation for backends; Web Vitals and JS errors for web; crash-free sessions and ANRs for mobile; crashes and FPS for games), dashboards, and alerts on user-facing SLO burn rather than noisy resource spikes.
+6. **Release: separate deploy from release.**
+   - Ship dark behind a feature flag. Prefer the vendor-neutral OpenFeature API (a CNCF incubating project), so the flag provider can change without code changes.
+   - Ramp progressively (canary, staged rollout, blue-green) with automated health and SLO checks that roll back on their own.
+   - Run synthetic smoke tests after cutover. Remove the flag once it's at 100% and stable, because stale flags are dead code.
+7. **Measure delivery (DORA, five metrics):** deployment frequency, change lead time, change fail rate, failed deployment recovery time, and deployment rework rate (the share of deployments that are unplanned fixes for production incidents). Derive them from git, CI and incident data, and review the trend, not single values.
+8. **Runbook and release notes:** rollback command, top failure modes, dashboards and owners in a concise runbook; atomic commits and a changelog entry per release.
 
 ## Gotchas
 
-- **ClickOps drift:** Manual console edits that bypass IaC create unrepeatable outages during recovery.
-- **Rebuilding artifacts per environment:** "Works in staging, breaks in prod" happens when prod runs a fresh build pulling drifted dependencies.
-- **Alert fatigue:** Paging on every transient warning teaches engineers to ignore alerts. Page strictly on actionable SLO impact.
+- **ClickOps drift:** manual console edits that bypass IaC create outages nobody can reproduce during recovery.
+- **Rebuilding per environment:** "works in staging, breaks in prod" happens when prod runs a fresh build that pulled drifted dependencies.
+- **Pinned once, never updated:** SHA pins without Renovate rot into known-vulnerable versions. Pin *and* automate the updates.
+- **Alert fatigue:** paging on every transient warning teaches people to ignore pages. Page only on actionable SLO impact.
+- **Flags forever:** a flag left in after full rollout is a second code path nobody tests.
