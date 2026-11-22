@@ -285,7 +285,9 @@ def build(run_dir: Path, contract_path: Path, max_unit_lines: int, repo_root: Pa
                     "loc": sum(m["loc"] for m in per_file.values() if m["layer"] == l.name)} for l in contract.layers],
         "unassigned": sorted(f for f, m in per_file.items() if m["layer"] is None),
         "overlaps": overlaps,
-        "hotspots": sorted(per_file, key=lambda f: -per_file[f]["risk"])[:10],
+        # Production risk first: test files get their own short list instead of crowding out the code they test.
+        "hotspots": sorted((f for f in per_file if not per_file[f]["is_test"]), key=lambda f: -per_file[f]["risk"])[:10],
+        "test_hotspots": sorted((f for f in per_file if per_file[f]["is_test"]), key=lambda f: -per_file[f]["risk"])[:5],
         "dead_file_candidates": sorted(dead_file_candidates),
         "unreferenced_symbols": unreferenced,
         "duplicates": clones,
@@ -337,12 +339,14 @@ def render_md(m: dict) -> str:
         out += ["\n## Files in no layer (every rule misses them)\n"] + [f"- `{f}`" for f in m["unassigned"]]
     if m["overlaps"]:
         out += ["\n## Files matching more than one layer\n"] + [f"- `{o['file']}`: {', '.join(o['layers'])}" for o in m["overlaps"]]
-    out += ["\n## Hotspots (risk = churn × complexity × size, plus tool findings)\n",
+    out += ["\n## Hotspots, production code (risk = churn × complexity × size, plus tool findings)\n",
             "| File | Layer | Lines | Max CCN | Churn | Fan-in | Tool findings | Risk |", "|---|---|---|---|---|---|---|---|"]
     for f in m["hotspots"]:
         x = m["files"][f]
         out.append(f"| `{f}` | {x['layer'] or 'unassigned'} | {x['loc']} | {x['max_ccn'] if x['max_ccn'] is not None else '-'} | "
                    f"{x['churn']} | {x['fan_in'] if x['fan_in'] is not None else '-'} | {len(x['tool_findings'])} | {x['risk']} |")
+    if m["test_hotspots"]:
+        out += ["\n## Hotspots, test code\n"] + [f"- `{f}`: risk {m['files'][f]['risk']}" for f in m["test_hotspots"]]
     if m["dead_file_candidates"]:
         out += ["\n## Dead-file candidates (signal 1 of 2: no incoming references in the graph)\n"]
         out += [f"- `{f}`" for f in m["dead_file_candidates"]]
