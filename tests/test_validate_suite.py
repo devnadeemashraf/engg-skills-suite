@@ -199,3 +199,12 @@ def test_repository_skills_pass() -> None:
     errors, skill_dirs = vs.validate_suite(vs.DEFAULT_SKILLS_ROOT)
     assert errors == []
     assert len(skill_dirs) >= 11
+
+
+def test_interpreter_caches_are_ignored(tmp_path: Path) -> None:
+    sdir = make_skill(tmp_path, body=VALID_BODY + "Run `scripts/tool.py`.\n",
+                      refs={"references/guide.md": "x\n", "scripts/tool.py": "print(1)\n"})
+    cache = sdir / "scripts" / "__pycache__"
+    cache.mkdir()
+    (cache / "tool.cpython-312.pyc").write_bytes(b"\x00")
+    assert errors_for(tmp_path) == []
