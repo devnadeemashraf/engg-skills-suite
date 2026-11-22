@@ -38,4 +38,4 @@ groups:
   ratchet:
     files:
       - scripts/ratchet.py
-    skills: [engg-deep-audit, engg-refactor]
+    skills: [engg-audit, engg-deep-audit, engg-refactor]
