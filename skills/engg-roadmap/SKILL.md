@@ -1,9 +1,9 @@
 ---
 name: engg-roadmap
-description: Grills, reality-checks, re-sequences, and hardens an existing product or engineering roadmap against the actual codebase, delivery constraints, and technical risks, then routes each milestone to the rest of the engineering skill suite (engg-architect, engg-plan, engg-build, engg-extend, engg-audit, engg-research, engg-debug, engg-data, engg-ship). Use when improving an in-progress roadmap, cutting scope bloat, de-risking milestones, aligning roadmap promises with real code, or accelerating shipping velocity.
+description: Grills, reality-checks, re-sequences, and hardens an existing product or engineering roadmap against the actual codebase, delivery constraints, and technical risks, then routes each milestone to the rest of the engineering skill suite (engg-architect, engg-plan, engg-build, engg-extend, engg-refactor, engg-audit, engg-deep-audit, engg-research, engg-debug, engg-data, engg-ship). Use when improving an in-progress roadmap, cutting scope bloat, de-risking milestones, aligning roadmap promises with real code, or accelerating shipping velocity.
 license: Apache-2.0
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---
@@ -21,17 +21,18 @@ Pressure-test an existing roadmap against engineering reality, strip out drag an
 ## Non-Negotiable Rules
 
 1. **Load references before grilling:** Always read `references/engineering-constitution.md`, `references/roadmap-grill-bank.md`, and `references/roadmap-hardening-template.md` before Round 1.
-2. **Anchor to repository reality first:** If a codebase exists, inspect the repo structure, tests, CI gates, open debt, and active architecture _before_ grilling. Never critique a roadmap in a vacuum when real code is available.
+2. **Anchor to repository reality first, with tools:** If a codebase exists, measure it _before_ grilling: `scc` for size per area, `graphify update .` and its `GRAPH_REPORT.md` for the real module structure and hubs, the test and CI configuration, and a recent `engg-deep-audit` `map.md`/`REPORT.md` if one exists. Never critique a roadmap in a vacuum, or from a skim, when real code is available.
 3. **Grill interactively before rewriting:** Run **2 to 4 focused Grill Rounds** (5–7 sharp questions per round). Never silently rewrite a roadmap without resolving priority, risk, and scope trade-offs with the owner.
 4. **Enforce the 50% Timeline Razor:** Every hardening pass must identify what survives if the delivery window is cut in half, forcing crisp V-Next vs. Deferred boundaries.
-5. **Route every hardened milestone into the suite:** Every surviving item must map explicitly to its next execution skill (`engg-research`, `engg-architect`, `engg-audit`, `engg-plan`, `engg-build`, `engg-extend`, `engg-data`, `engg-debug`, or `engg-ship`)—never leave vague prose milestones.
+5. **Route every hardened milestone into the suite:** Every surviving item must map explicitly to its next execution skill (`engg-research`, `engg-architect`, `engg-deep-audit`, `engg-audit`, `engg-plan`, `engg-build`, `engg-extend`, `engg-refactor`, `engg-data`, `engg-debug`, or `engg-ship`)—never leave vague prose milestones.
 6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 
 1. **Baseline Reconnaissance (Codebase vs. Roadmap Reality Check):**
    - Read the existing roadmap (e.g., `docs/ROADMAP.md`, issues, or pasted plan).
-   - If working in an existing repo, map what is genuinely built, tested, and production-hardened vs. what is partially wired, untested, or assumed.
+   - If working in an existing repo, map what is genuinely built, tested, and production-hardened vs. what is partially wired, untested, or assumed. Cite the evidence (file paths, test files, CI jobs, graph communities).
+   - **Delivery baseline (DORA):** from git and CI history, estimate deployment frequency, change lead time, change fail rate, failed deployment recovery time, and deployment rework rate (the share of deployments that were unplanned fixes). Where the data doesn't exist, say so: a missing baseline is itself a Milestone-1 prerequisite.
    - Surface immediate **Reality Gaps** (e.g., Milestone 2 assumes auth, migrations, or telemetry that do not exist yet).
 2. **Execute 2 to 4 Focused Grill Rounds (`references/roadmap-grill-bank.md`):**
    - **Round 1 — Outcome Sharpness & Reality Gaps:** Target user outcome per milestone, dead-weight items, and mismatches between roadmap claims and actual code.
@@ -46,7 +47,7 @@ Pressure-test an existing roadmap against engineering reality, strip out drag an
 5. **Seamless Handoff to the Rest of the Suite:**
    - Unknown library/API or breaking upgrade in next milestone -> `engg-research`
    - Major unarchitected subsystem or contract gap -> `engg-architect`
-   - Fragile/untested existing modules blocking the milestone -> `engg-audit` (Mode B)
+   - Foundations unknown, or fragile/untested modules blocking the milestone -> `engg-deep-audit`, then its cleanup waves -> `engg-refactor`
    - Ready next milestone (1–2 max at a time) -> `engg-plan` -> **[`engg-build` / `engg-extend` / `engg-data` / `engg-debug` -> `engg-audit` (Mode A)]** -> `engg-ship`
 
 ## Gotchas
