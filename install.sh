@@ -1,123 +1,124 @@
 #!/usr/bin/env bash
+# Unified Engineering Skills Suite installer (macOS / Linux).
+# On Windows, use install.ps1: Git Bash's `ln -s` silently copies unless native symlinks are enabled.
 set -euo pipefail
-
-# Unified Engineering Skills Suite Installer
-# Supports: Claude Code CLI, Antigravity CLI, Antigravity IDE (plus Codex, Cursor, Copilot, OpenCode)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SRC_SKILLS_DIR="${SCRIPT_DIR}/skills"
 MODE=""
 PROJECT_DIR=""
 USE_COPY=0
+UNINSTALL=0
+DRY_RUN=0
 
 usage() {
   cat <<'EOF'
 Usage:
-  ./install.sh --global [--copy]
-      Installs skills globally for:
-        - Antigravity CLI & Antigravity IDE (~/.gemini/config/skills/)
-        - Claude Code CLI (~/.claude/skills/)
-      (Canonical copy stored in ~/.engg-skills-suite/skills/ and symlinked unless --copy is set)
+  ./install.sh --global  [--copy] [--uninstall] [--dry-run]
+  ./install.sh --project <repo_path> [--copy] [--uninstall] [--dry-run]
 
-  ./install.sh --project <repo_path> [--copy]
-      Installs skills into a specific repository:
-        - Canonical workspace path: <repo>/.agents/skills/  (Antigravity IDE, Antigravity CLI, Codex, Cursor, Copilot)
-        - Claude Code link:         <repo>/.claude/skills/  (symlinked to ../.agents/skills/<skill>)
+Scopes:
+  --global            Canonical copy in ~/.engg-skills-suite/skills/, linked into:
+                        ~/.claude/skills/            (Claude Code)
+                        ~/.gemini/config/skills/     (Antigravity CLI & IDE)
+  --project <path>    Canonical copy in <repo>/.agents/skills/ (open standard: Antigravity,
+                      Codex, Cursor, Copilot, OpenCode), linked into <repo>/.claude/skills/.
 
 Options:
-  --copy    Copy files instead of creating symlinks (useful when symlinks are restricted)
-  -h,--help Show this help
+  --copy        Copy files instead of creating symlinks
+  --uninstall   Remove only the skills that ship with this suite (other skills are untouched)
+  --dry-run     Print what would happen without changing anything
+  -h, --help    Show this help
 EOF
 }
 
+die() { echo "Error: $*" >&2; echo >&2; usage >&2; exit 1; }
+
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --global) MODE="global"; shift ;;
-    --project) MODE="project"; PROJECT_DIR="${2:-}"; shift 2 ;;
+    --global) [[ -z "$MODE" ]] || die "choose exactly one of --global or --project"; MODE="global"; shift ;;
+    --project)
+      [[ -z "$MODE" ]] || die "choose exactly one of --global or --project"
+      [[ $# -ge 2 && "$2" != --* ]] || die "--project needs a repository path"
+      MODE="project"; PROJECT_DIR="$2"; shift 2 ;;
     --copy) USE_COPY=1; shift ;;
+    --uninstall) UNINSTALL=1; shift ;;
+    --dry-run) DRY_RUN=1; shift ;;
     -h|--help) usage; exit 0 ;;
-    *) echo "Unknown option: $1" >&2; usage; exit 1 ;;
+    *) die "unknown option: $1" ;;
   esac
 done
 
-if [[ -z "$MODE" ]]; then
-  usage
-  exit 1
-fi
+[[ -n "$MODE" ]] || die "choose a scope: --global or --project <path>"
+[[ -d "$SRC_SKILLS_DIR" ]] || die "skills directory not found next to this script: $SRC_SKILLS_DIR"
 
-install_skill() {
-  local src="$1"
-  local dst="$2"
-  local rel_link="${3:-}"
+# Print the command; run it unless --dry-run.
+run() {
+  echo "+ $*"
+  if [[ "$DRY_RUN" -eq 0 ]]; then "$@"; fi
+}
 
-  rm -rf "$dst"
+# Remove a previous install entry. `rm -rf` on a symlink path (no trailing slash) removes the link, not its target.
+remove_entry() {
+  local path="$1"
+  if [[ -L "$path" || -e "$path" ]]; then run rm -rf "$path"; fi
+}
+
+# Link (or copy with --copy) src to dst. link_target lets project installs use a relative link.
+place() {
+  local src="$1" dst="$2" link_target="${3:-$1}"
+  remove_entry "$dst"
   if [[ "$USE_COPY" -eq 1 ]]; then
-    cp -R "$src" "$dst"
+    run cp -R "$src" "$dst"
   else
-    if [[ -n "$rel_link" ]]; then
-      ln -s "$rel_link" "$dst"
-    else
-      ln -s "$src" "$dst"
-    fi
+    run ln -s "$link_target" "$dst"
   fi
 }
 
+SKILLS=()
+for skill_path in "${SRC_SKILLS_DIR}"/*/; do
+  [[ -f "${skill_path}SKILL.md" ]] || continue
+  SKILLS+=("$(basename "$skill_path")")
+done
+[[ ${#SKILLS[@]} -gt 0 ]] || die "no skills found in $SRC_SKILLS_DIR"
+
 if [[ "$MODE" == "global" ]]; then
   CANONICAL_DIR="${HOME}/.engg-skills-suite/skills"
-  AGY_GLOBAL="${HOME}/.gemini/config/skills"
-  CLAUDE_GLOBAL="${HOME}/.claude/skills"
-
-  mkdir -p "$CANONICAL_DIR" "$AGY_GLOBAL" "$CLAUDE_GLOBAL"
-
-  for skill_path in "${SRC_SKILLS_DIR}"/*; do
-    [[ -d "$skill_path" ]] || continue
-    skill_name="$(basename "$skill_path")"
-
-    rm -rf "${CANONICAL_DIR}/${skill_name}"
-    cp -R "$skill_path" "${CANONICAL_DIR}/${skill_name}"
-
-    install_skill "${CANONICAL_DIR}/${skill_name}" "${AGY_GLOBAL}/${skill_name}"
-    install_skill "${CANONICAL_DIR}/${skill_name}" "${CLAUDE_GLOBAL}/${skill_name}"
-    echo "Installed global skill: ${skill_name}"
-  done
-
-  echo ""
-  echo "Done! Installed $(ls -1 "${SRC_SKILLS_DIR}" | wc -l | tr -d ' ') skills globally:"
-  echo "  - Canonical store:              ${CANONICAL_DIR}"
-  echo "  - Antigravity IDE & CLI:        ${AGY_GLOBAL}"
-  echo "  - Claude Code CLI:              ${CLAUDE_GLOBAL}"
-  echo ""
-  echo "Verify with:"
-  echo "  Claude Code CLI:  claude skills list  (or ask: 'What skills do you have?')"
-  echo "  Antigravity CLI:  /skills"
-  echo "  Antigravity IDE:  Ask the agent 'Which skills are installed?' or type '/'"
-
-elif [[ "$MODE" == "project" ]]; then
-  if [[ -z "$PROJECT_DIR" || ! -d "$PROJECT_DIR" ]]; then
-    echo "Error: Provide an existing project directory path after --project" >&2
-    exit 1
-  fi
-
+  TOOL_DIRS=("${HOME}/.claude/skills" "${HOME}/.gemini/config/skills")
+else
+  [[ -d "$PROJECT_DIR" ]] || die "project directory does not exist: $PROJECT_DIR"
   PROJECT_ABS="$(cd "$PROJECT_DIR" && pwd)"
-  AGENTS_DIR="${PROJECT_ABS}/.agents/skills"
-  CLAUDE_DIR="${PROJECT_ABS}/.claude/skills"
-
-  mkdir -p "$AGENTS_DIR" "$CLAUDE_DIR"
-
-  for skill_path in "${SRC_SKILLS_DIR}"/*; do
-    [[ -d "$skill_path" ]] || continue
-    skill_name="$(basename "$skill_path")"
-
-    rm -rf "${AGENTS_DIR}/${skill_name}"
-    cp -R "$skill_path" "${AGENTS_DIR}/${skill_name}"
-
-    # Relative symlink from .claude/skills/<name> -> ../../.agents/skills/<name>
-    install_skill "${AGENTS_DIR}/${skill_name}" "${CLAUDE_DIR}/${skill_name}" "../../.agents/skills/${skill_name}"
-    echo "Installed project skill: ${skill_name}"
-  done
-
-  echo ""
-  echo "Done! Installed project-scoped skills into ${PROJECT_ABS}:"
-  echo "  - Canonical (.agents/skills):   ${AGENTS_DIR}  (Antigravity IDE/CLI, Codex, Cursor, Copilot)"
-  echo "  - Claude Code (.claude/skills): ${CLAUDE_DIR}"
+  CANONICAL_DIR="${PROJECT_ABS}/.agents/skills"
+  TOOL_DIRS=("${PROJECT_ABS}/.claude/skills")
 fi
+
+if [[ "$UNINSTALL" -eq 1 ]]; then
+  for skill in "${SKILLS[@]}"; do
+    for dir in "${TOOL_DIRS[@]}"; do remove_entry "${dir}/${skill}"; done
+    remove_entry "${CANONICAL_DIR}/${skill}"
+    echo "Removed: ${skill}"
+  done
+  echo "Done. Uninstalled ${#SKILLS[@]} skills (${MODE} scope)."
+  exit 0
+fi
+
+run mkdir -p "$CANONICAL_DIR" "${TOOL_DIRS[@]}"
+for skill in "${SKILLS[@]}"; do
+  remove_entry "${CANONICAL_DIR}/${skill}"
+  run cp -R "${SRC_SKILLS_DIR}/${skill}" "${CANONICAL_DIR}/${skill}"
+  for dir in "${TOOL_DIRS[@]}"; do
+    if [[ "$MODE" == "project" ]]; then
+      # <repo>/.claude/skills/<name> -> ../../.agents/skills/<name> (survives moving the repo)
+      place "${CANONICAL_DIR}/${skill}" "${dir}/${skill}" "../../.agents/skills/${skill}"
+    else
+      place "${CANONICAL_DIR}/${skill}" "${dir}/${skill}"
+    fi
+  done
+  echo "Installed: ${skill}"
+done
+
+echo ""
+echo "Done. Installed ${#SKILLS[@]} skills (${MODE} scope)."
+echo "  Canonical store: ${CANONICAL_DIR}"
+for dir in "${TOOL_DIRS[@]}"; do echo "  Linked into:     ${dir}"; done
+if [[ "$DRY_RUN" -eq 1 ]]; then echo "(dry run: nothing was changed)"; fi

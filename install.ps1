@@ -1,50 +1,162 @@
 <#
 .SYNOPSIS
-  Installs the Unified Engineering Skills Suite for Claude Code CLI, Antigravity CLI, and Antigravity IDE.
+  Installs the Unified Engineering Skills Suite (Windows PowerShell 5.1+ and PowerShell 7+).
+
+.DESCRIPTION
+  Global scope:  canonical copy in ~/.engg-skills-suite/skills, linked into
+                 ~/.claude/skills (Claude Code) and ~/.gemini/config/skills (Antigravity CLI & IDE).
+  Project scope: canonical copy in <repo>/.agents/skills (open standard: Antigravity, Codex,
+                 Cursor, Copilot, OpenCode), linked into <repo>/.claude/skills.
+
+  Links are symbolic links when allowed (Developer Mode or admin), otherwise directory junctions,
+  which need no special rights. Use -Copy to copy files instead.
+
 .EXAMPLE
   .\install.ps1 -Scope Global
+.EXAMPLE
   .\install.ps1 -Scope Project -ProjectPath "C:\work\my-repo"
+.EXAMPLE
+  .\install.ps1 -Scope Project -ProjectPath "C:\work\my-repo" -Uninstall -DryRun
 #>
+[CmdletBinding()]
 param(
-  [Parameter(Mandatory=$true)]
+  [Parameter(Mandatory = $true)]
   [ValidateSet("Global", "Project")]
   [string]$Scope,
 
-  [string]$ProjectPath = ""
+  [string]$ProjectPath = "",
+
+  # Home directory for -Scope Global (defaults to your profile; useful for testing or other users).
+  [string]$HomeDir = $HOME,
+
+  # Copy files instead of linking.
+  [switch]$Copy,
+
+  # Remove only the skills that ship with this suite; other skills are untouched.
+  [switch]$Uninstall,
+
+  # Print what would happen without changing anything.
+  [switch]$DryRun
 )
 
+Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$SrcSkills = Join-Path $ScriptDir "skills"
 
-function Copy-SkillFolder($Source, $Dest) {
-  if (Test-Path $Dest) { Remove-Item -Recurse -Force $Dest }
-  Copy-Item -Recurse -Force $Source $Dest
+$SrcSkills = Join-Path $PSScriptRoot "skills"
+if (-not (Test-Path -LiteralPath $SrcSkills -PathType Container)) {
+  throw "Skills directory not found next to this script: $SrcSkills"
 }
+
+$Skills = @(Get-ChildItem -LiteralPath $SrcSkills -Directory |
+  Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName "SKILL.md") -PathType Leaf } |
+  Select-Object -ExpandProperty Name)
+if ($Skills.Count -eq 0) { throw "No skills found in $SrcSkills" }
+
+function Write-Step([string]$Message) {
+  Write-Host "+ $Message"
+}
+
+function Test-IsLink([string]$Path) {
+  $item = Get-Item -LiteralPath $Path -Force -ErrorAction SilentlyContinue
+  return ($null -ne $item) -and (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0)
+}
+
+# Removes a previous install entry. Links are deleted non-recursively: in Windows PowerShell 5.1,
+# Remove-Item -Recurse on a junction can delete the contents of the folder it points to.
+function Remove-InstallEntry([string]$Path) {
+  if (-not (Test-Path -LiteralPath $Path) -and -not (Test-IsLink $Path)) { return }
+  Write-Step "remove $Path"
+  if ($DryRun) { return }
+  if (Test-IsLink $Path) {
+    [IO.Directory]::Delete($Path, $false)
+  } else {
+    Remove-Item -LiteralPath $Path -Recurse -Force
+  }
+}
+
+function New-InstallDir([string]$Path) {
+  if (Test-Path -LiteralPath $Path -PathType Container) { return }
+  Write-Step "mkdir $Path"
+  if (-not $DryRun) { New-Item -ItemType Directory -Force -Path $Path | Out-Null }
+}
+
+function Copy-SkillFolder([string]$Source, [string]$Dest) {
+  Write-Step "copy $Source -> $Dest"
+  if (-not $DryRun) { Copy-Item -LiteralPath $Source -Destination $Dest -Recurse -Force }
+}
+
+# Links Dest to Source: a symbolic link if permitted, otherwise a junction (absolute path).
+function New-SkillLink([string]$Source, [string]$Dest, [string]$RelativeTarget) {
+  if ($Copy) { Copy-SkillFolder $Source $Dest; return }
+  $target = $Source
+  if ($RelativeTarget) { $target = $RelativeTarget }
+  Write-Step "link $Dest -> $target"
+  if ($DryRun) { return }
+  try {
+    if ($RelativeTarget) {
+      # New-Item resolves relative targets against the current directory, so resolve from Dest's parent.
+      Push-Location (Split-Path -Parent $Dest)
+      try { New-Item -ItemType SymbolicLink -Path $Dest -Target $RelativeTarget -ErrorAction Stop | Out-Null }
+      finally { Pop-Location }
+    } else {
+      New-Item -ItemType SymbolicLink -Path $Dest -Target $Source -ErrorAction Stop | Out-Null
+    }
+  } catch {
+    if (-not $IsWindowsHost) { throw }
+    Write-Host "  symlink not permitted; using a directory junction instead"
+    New-Item -ItemType Junction -Path $Dest -Target $Source -ErrorAction Stop | Out-Null
+  }
+}
+
+# $IsWindows exists only in PowerShell 6+; Windows PowerShell 5.1 always runs on Windows.
+$IsWindowsHost = ($PSVersionTable.PSEdition -eq "Desktop") -or ((Get-Variable IsWindows -ValueOnly -ErrorAction SilentlyContinue) -eq $true)
 
 if ($Scope -eq "Global") {
-  $AgyGlobal = Join-Path $HOME ".gemini\config\skills"
-  $ClaudeGlobal = Join-Path $HOME ".claude\skills"
-  New-Item -ItemType Directory -Force -Path $AgyGlobal, $ClaudeGlobal | Out-Null
-
-  Get-ChildItem -Directory $SrcSkills | ForEach-Object {
-    Copy-SkillFolder $_.FullName (Join-Path $AgyGlobal $_.Name)
-    Copy-SkillFolder $_.FullName (Join-Path $ClaudeGlobal $_.Name)
-    Write-Host "Installed global skill: $($_.Name)"
-  }
-  Write-Host "`nInstalled globally to:`n  - $AgyGlobal (Antigravity IDE & CLI)`n  - $ClaudeGlobal (Claude Code CLI)"
+  if (-not (Test-Path -LiteralPath $HomeDir -PathType Container)) { throw "Home directory does not exist: $HomeDir" }
+  $CanonicalDir = Join-Path $HomeDir ".engg-skills-suite/skills"
+  $ToolDirs = @((Join-Path $HomeDir ".claude/skills"), (Join-Path $HomeDir ".gemini/config/skills"))
+  $UseRelative = $false
 } else {
-  if (-not $ProjectPath -or -not (Test-Path $ProjectPath)) {
-    throw "Provide an existing -ProjectPath when using -Scope Project."
+  if (-not $ProjectPath) { throw "-ProjectPath is required with -Scope Project." }
+  if (-not (Test-Path -LiteralPath $ProjectPath -PathType Container)) {
+    throw "Project directory does not exist: $ProjectPath"
   }
-  $AgentsDir = Join-Path $ProjectPath ".agents\skills"
-  $ClaudeDir = Join-Path $ProjectPath ".claude\skills"
-  New-Item -ItemType Directory -Force -Path $AgentsDir, $ClaudeDir | Out-Null
-
-  Get-ChildItem -Directory $SrcSkills | ForEach-Object {
-    Copy-SkillFolder $_.FullName (Join-Path $AgentsDir $_.Name)
-    Copy-SkillFolder $_.FullName (Join-Path $ClaudeDir $_.Name)
-    Write-Host "Installed project skill: $($_.Name)"
-  }
-  Write-Host "`nInstalled project skills to:`n  - $AgentsDir (Antigravity IDE & CLI, Codex, Cursor, Copilot)`n  - $ClaudeDir (Claude Code CLI)"
+  $ProjectAbs = (Resolve-Path -LiteralPath $ProjectPath).ProviderPath
+  $CanonicalDir = Join-Path $ProjectAbs ".agents/skills"
+  $ToolDirs = @(Join-Path $ProjectAbs ".claude/skills")
+  $UseRelative = $true
 }
+
+if ($Uninstall) {
+  foreach ($skill in $Skills) {
+    foreach ($dir in $ToolDirs) { Remove-InstallEntry (Join-Path $dir $skill) }
+    Remove-InstallEntry (Join-Path $CanonicalDir $skill)
+    Write-Host "Removed: $skill"
+  }
+  Write-Host "Done. Uninstalled $($Skills.Count) skills ($Scope scope)."
+  return
+}
+
+New-InstallDir $CanonicalDir
+foreach ($dir in $ToolDirs) { New-InstallDir $dir }
+
+foreach ($skill in $Skills) {
+  $canonical = Join-Path $CanonicalDir $skill
+  Remove-InstallEntry $canonical
+  Copy-SkillFolder (Join-Path $SrcSkills $skill) $canonical
+  foreach ($dir in $ToolDirs) {
+    $dest = Join-Path $dir $skill
+    Remove-InstallEntry $dest
+    $relative = $null
+    # Platform separator: Windows symlinks with "/" in a relative target do not resolve reliably.
+    if ($UseRelative) { $relative = [IO.Path]::Combine("..", "..", ".agents", "skills", $skill) }
+    New-SkillLink $canonical $dest $relative
+  }
+  Write-Host "Installed: $skill"
+}
+
+Write-Host ""
+Write-Host "Done. Installed $($Skills.Count) skills ($Scope scope)."
+Write-Host "  Canonical store: $CanonicalDir"
+foreach ($dir in $ToolDirs) { Write-Host "  Linked into:     $dir" }
+if ($DryRun) { Write-Host "(dry run: nothing was changed)" }
