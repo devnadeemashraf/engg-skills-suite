@@ -3,7 +3,7 @@ name: engg-debug
 description: Runs an evidence-driven scientific debugging and performance profiling loop across backend, web, mobile, game, database, and infrastructure systems. Enforces reproduction, measurement, hypothesis isolation, root-cause fixes, and permanent regression tests instead of guesswork patching. Use when investigating bugs, crashes, race conditions, memory leaks, latency spikes, frame drops, or slow queries.
 license: Apache-2.0
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---
@@ -38,11 +38,13 @@ Solve complex defects and performance bottlenecks systematically using the scien
    - Identify the exact hot path or failing invariant—cite file, line, and measured cost.
 4. **Form & Test Ranked Hypotheses (1–3 max):**
    - State the primary hypothesis, what evidence would confirm it, and what evidence would falsify it.
-   - Verify via targeted diagnostic probe or bisect (`git bisect` for regressions) before modifying production logic.
+   - Verify via a targeted diagnostic probe before modifying production logic. For regressions, let git find the commit: `git bisect start <bad> <good>` then `git bisect run <repro-script>`, where the script exits 0 when good and 1 when bad (125 to skip an unbuildable commit). Cite the first bad commit.
+   - Use the graph for "what else does this touch?" (`graphify affected "<symbol>"`) instead of reading call sites by hand.
 5. **Apply Minimal Surgical Fix + Regression Test:**
    - Write the failing regression test (or benchmark assertion) first.
    - Implement the cleanest root-cause fix upholding SOLID/KISS/ATOMIC principles.
    - Verify before/after metrics and run the full verification suite + `engg-audit` (Mode A) on the diff.
+   - Report performance work as an **evidence table**: metric, baseline, after, same machine/data/load, number of runs, and the variance. A single run proves nothing. Repeat each measurement (at least 5 runs) and report the median and spread.
 6. **Emit Post-Incident Note (for P0/P1 defects):**
    - Document Root Cause, Trigger Condition, Fix, Before/After Evidence, and Systemic Prevention (lint rule, invariant, or alert).
 
@@ -50,4 +52,5 @@ Solve complex defects and performance bottlenecks systematically using the scien
 
 - **Premature micro-optimization:** Optimizing a function accounting for 0.4% of frame/request time while ignoring a 60% I/O stall or GC spike wastes time and harms readability.
 - **Observer effect:** Heavy synchronous debug logging inside a race condition or hot loop can mask the very bug you are hunting.
+- **Fixing the reproduction, not the bug:** a fix that only makes the repro script pass, for example by special-casing its input, isn't a fix. The regression test must express the general invariant.
 - **Dirtying the repo with debug prints:** Remove all temporary instrumentation before committing, or promote genuinely useful signals into structured observability.
