@@ -1,0 +1,139 @@
+{
+  "summary": {
+    "violations": [
+      {
+        "type": "dependency",
+        "from": "src/orders/adapters/payment-client.ts",
+        "to": "src/config.ts",
+        "unresolvedTo": "../../config",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "adapters-not-to-composition"
+        }
+      },
+      {
+        "type": "dependency",
+        "from": "src/orders/domain/order.ts",
+        "to": "src/orders/adapters/order-repo.ts",
+        "unresolvedTo": "../adapters/order-repo",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "domain-not-to-adapters"
+        }
+      },
+      {
+        "type": "dependency",
+        "from": "src/scratch/tmp-migrate.ts",
+        "to": "src/orders/adapters/order-repo.ts",
+        "unresolvedTo": "../orders/adapters/order-repo",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "modules-isolated"
+        }
+      },
+      {
+        "type": "dependency",
+        "from": "src/users/app/register.ts",
+        "to": "src/orders/domain/order.ts",
+        "unresolvedTo": "../../orders/domain/order",
+        "dependencyTypes": [
+          "local",
+          "type-only",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "modules-isolated"
+        }
+      },
+      {
+        "type": "cycle",
+        "from": "src/orders/adapters/order-repo.ts",
+        "to": "src/orders/domain/order.ts",
+        "unresolvedTo": "../domain/order",
+        "dependencyTypes": [
+          "local",
+          "type-only",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "no-circular"
+        },
+        "cycle": [
+          {
+            "name": "src/orders/domain/order.ts",
+            "dependencyTypes": [
+              "local",
+              "type-only",
+              "import"
+            ]
+          },
+          {
+            "name": "src/orders/adapters/order-repo.ts",
+            "dependencyTypes": [
+              "local",
+              "import"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "cycle",
+        "from": "src/orders/app/place-order.ts",
+        "to": "src/orders/app/pricing.ts",
+        "unresolvedTo": "./pricing",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "no-circular"
+        },
+        "cycle": [
+          {
+            "name": "src/orders/app/pricing.ts",
+            "dependencyTypes": [
+              "local",
+              "import"
+            ]
+          },
+          {
+            "name": "src/orders/app/place-order.ts",
+            "dependencyTypes": [
+              "local",
+              "import"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "dependency",
+        "from": "src/orders/http/routes.ts",
+        "to": "src/orders/adapters/order-repo.ts",
+        "unresolvedTo": "../adapters/order-repo",
+        "dependencyTypes": [
+          "local",
+          "import"
+        ],
+        "rule": {
+          "severity": "error",
+          "name": "transport-not-to-adapters"
+        }
+      }
+    ]
+  }
+}
