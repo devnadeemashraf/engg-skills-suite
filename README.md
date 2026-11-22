@@ -1,80 +1,119 @@
 <div align="center">
 
-# Unified Engineering Skills Suite (`engg-skills-suite`)
+# engg-skills-suite
 
-**One model-agnostic, stack-agnostic suite of 13 Principal-grade Agent Skills covering the entire software engineering lifecycle — from raw idea and roadmap grilling to strict TDD, adversarial auditing, zero-downtime migrations, and production shipping.**
+**Make your AI coding agent work like a disciplined senior engineering team.**
 
-[![Agent Skills Spec](https://img.shields.io/badge/Standard-agentskills.io-2563EB?style=for-the-badge)](https://agentskills.io)
-[![Skills](https://img.shields.io/badge/Skills-13%20Unified-0F766E?style=for-the-badge)](#-the-11-skill-catalog)
-[![Surfaces](https://img.shields.io/badge/Stacks-Backend%20%7C%20Web%20%7C%20Mobile%20%7C%20Game%20%7C%20Data%20%7C%20DevOps-4F46E5?style=for-the-badge)](#-supported-engineering-surfaces)
-[![License](https://img.shields.io/badge/License-Apache--2.0-334155?style=for-the-badge)](LICENSE)
+Thirteen open-standard Agent Skills that teach any coding agent to plan before it codes, test before it builds, respect your architecture, audit whole codebases with real open-source tools, and ship safely, on any stack.
 
-[Why This Suite](#-why-this-suite-exists) • [The 13 Skills](#-the-13-skill-catalog) • [How I Use It](#-how-i-use-it-real-workflows--why) • [Install & Setup](#-installation--idecli-setup) • [Repo Structure](#-repository-structure)
+[![Validate](https://github.com/devnadeemashraf/engg-skills-suite/actions/workflows/validate.yml/badge.svg)](https://github.com/devnadeemashraf/engg-skills-suite/actions/workflows/validate.yml)
+[![Agent Skills](https://img.shields.io/badge/standard-agentskills.io-2563EB)](https://agentskills.io/specification)
+[![Skills](https://img.shields.io/badge/skills-13-0F766E)](#the-skills)
+[![License](https://img.shields.io/badge/license-Apache--2.0-334155)](LICENSE)
+
+[What it is](#what-it-is) · [How it works](#how-it-works) · [The skills](#the-skills) · [Day-to-day use](#day-to-day-use) · [Setup](docs/SETUP.md) · [Recipes](docs/WORKFLOWS.md)
 
 </div>
 
 ---
 
-## Why This Suite Exists
+## What it is
 
-AI coding agents are fast—until they drift. Without strict guardrails, different models invent inconsistent architectures, skip edge-case tests, guess outdated package versions, bloat roadmaps, and silently introduce security or concurrency bugs.
+AI coding agents are fast, but left alone they drift:
+- they invent a new architecture each session
+- they test only the happy path, guess package versions from memory, and "clean up" code nobody asked them to touch
+- they report success without proof
 
-This repository packages my personal engineering operating system into **13 portable, open-standard (`SKILL.md`) skills** so **any LLM in any CLI or IDE** enforces the exact same discipline across every repository I touch:
+This suite is a set of **skills**: plain Markdown instruction packs that the agent loads when a task needs them. Each skill turns one part of engineering into a procedure the agent follows:
+- frame an idea, then design and plan it
+- build test-first
+- audit, refactor, debug, handle data
+- research versions, then release
 
-- **Timeless Engineering Design:** Strict **SOLID**, **DRY** (knowledge, not coincidental code), **KISS**, **ATOMIC** (modular composition, atomic state transitions, atomic commits), and **Hexagonal / Ports & Adapters** dependency flow.
-- **Five Non-Negotiable Production Invariants:** Explicit Contracts First, Defense-in-Depth Security, Bounded Everything (timeouts, pools, payloads, memory, frame budgets), Observable by Default, and Graceful Lifecycle.
-- **Zero Premature Code & Zero Rubber-Stamping:** Architecture and roadmaps get grilled _before_ coding; tests get written _before_ implementation; every diff gets adversarially audited (`P0`–`P3`) _before_ commit.
-- **Progressive Disclosure for Speed & Token Efficiency:** Every `SKILL.md` stays lean (under 150 lines, enforced by the validator). Heavy grill banks, 5-category test matrices, domain profiles, and audit checklists live in `references/` and load strictly on demand.
-- **100% Vendor-Neutral & Model-Agnostic:** Built strictly on the open `agentskills.io` specification—works identically with Claude Code CLI, Antigravity CLI, Antigravity IDE, Codex, Cursor, GitHub Copilot, OpenCode, or any web LLM.
+The skills follow the open [Agent Skills specification](https://agentskills.io/specification), so the same files work in Claude Code, Codex, Cursor, GitHub Copilot and Antigravity. They are stack-agnostic: backend, web, mobile, games, databases and infrastructure all use the same skills, with surface-specific checklists inside.
 
----
+**You keep the decisions.** The skills ask before they assume: which delivery mode you want, whether your existing architecture is fixed, and whether a tool may be installed. Then they hold the agent to your answers.
 
-## End-to-End Engineering Loop
+## How it works
+
+Five ideas run through every skill. You don't need to memorize them; the skills apply them for you.
+
+### 1. Ask first, then stay in lane: delivery modes
+
+At the start of any effort, the agent asks one question and records the answer in `.engg/delivery.yaml`:
+
+| Mode | You get | Best when |
+|---|---|---|
+| **`mvp-first`** | The core flow working end-to-end quickly, with everything critical done properly (security, architecture rules, tests, CI). Then small increments: features, improvements, fixes. | The idea is unproven, a demo or deadline is coming, or the scope is still moving |
+| **`full-sequence`** | Every planned part built one by one, each finished before the next | The scope is fixed and understood; libraries, platforms, infrastructure |
+
+It also records the **baseline**. If your project already has an architecture and tooling, they are **fixed**: the agent builds within them and writes improvement ideas into a backlog instead of redesigning. Only an explicit "redo it" opens a redesign. Neither mode ever lowers quality; `mvp-first` cuts scope, not standards.
+
+### 2. Architecture as a contract a machine checks
+
+Your agreed architecture lives in `.engg/architecture.yaml`: the layers, which layer may import which, external-package limits, and module isolation. `compile_contract.py` turns it into the native checker for your stack (dependency-cruiser, import-linter or go-arch-lint), so the same rules run in your editor, in pre-commit and in CI. A rule a checker can't express is reported as *not covered*, never silently dropped.
+
+### 3. Tools first, with your consent
+
+Reading thousands of lines and "remembering" them is slow and inaccurate. The skills use free, open-source tools wherever a tool does the job better:
+- a code knowledge graph ([graphify](https://github.com/safishamsi/graphify))
+- compact web reading ([only-cli](https://github.com/only-cli/oc))
+- complexity, duplication and dead-code finders
+- secret and vulnerability scanners
+- architecture checkers
+
+Nothing is installed without asking. The agent explains what the tool does, why this task needs it, whether any data leaves your machine, and how to remove it. If you decline, it says what accuracy is lost. See the [toolchain registry](shared/references/toolchain.md).
+
+### 4. Rigor that matches the risk
+
+Every change gets a **risk tier**, and the tier decides how much proof it needs:
+
+| Tier | Example | Required proof |
+|---|---|---|
+| T0 | docs, copy | formatter and linter |
+| T1 | internal logic, a UI component | plus unit tests, typecheck, architecture check |
+| T2 | public API, persistence, concurrency | plus all five test categories, contract tests, an adversarial review |
+| T3 | auth, money, personal data, migrations, infrastructure | plus mutation testing, security scans, a threat note, and your sign-off |
+
+### 5. Evidence, and a ratchet
+
+- **Evidence:** every claim cites a file and line or a tool result, and "verified" means a command ran and passed. Nothing is deleted unless two independent signals agree it's unused.
+- **The ratchet:** in existing code, the ratchet (`ratchet.py`) records today's violations as a baseline. CI then fails on any new one, and the baseline can only shrink. Messy code gets cleaner every week and can't quietly slide back.
+
+## The skills
+
+| Stage | Skill | Use it to | You get |
+|---|---|---|---|
+| **Shape** | [`engg-ideate`](skills/engg-ideate/SKILL.md) | Turn a rough idea into something worth building | A project charter: problem, users, the riskiest assumptions, a sharp V1, numeric success criteria |
+| | [`engg-roadmap`](skills/engg-roadmap/SKILL.md) | Pressure-test an existing roadmap against the real code | A hardened roadmap, cut to what matters, risk-first, each milestone routed to a skill |
+| | [`engg-architect`](skills/engg-architect/SKILL.md) | Design a system, or write down an existing one | A design doc, decision records, C4 diagrams, and the architecture contract |
+| **Plan** | [`engg-plan`](skills/engg-plan/SKILL.md) | Break a design, milestone or audit into work | Small vertical chunks, each with a risk tier, exact gate commands, and a rollback |
+| **Build** | [`engg-build`](skills/engg-build/SKILL.md) | Implement a chunk | Tests written first, then clean code, verified by your real commands |
+| | [`engg-extend`](skills/engg-extend/SKILL.md) | Add a feature or swap a dependency inside an existing architecture | A new slice or adapter matching your conventions, with shared contract tests |
+| | [`engg-refactor`](skills/engg-refactor/SKILL.md) | Clean up without changing behaviour | Behaviour pinned by tests, dead code removed on evidence, the ratchet going down |
+| | [`engg-data`](skills/engg-data/SKILL.md) | Change a schema, query or backfill | Zero-downtime migrations, linted SQL, query plans on realistic data |
+| **Verify** | [`engg-audit`](skills/engg-audit/SKILL.md) | Review a diff, a pull request or a spec | Severity-ranked findings (P0–P3), with P0/P1 fixed and regression-tested |
+| | [`engg-deep-audit`](skills/engg-deep-audit/SKILL.md) | Audit a whole codebase layer by layer | A tool-built map, a unit-by-unit review saved on disk, a scorecard, strip and move lists, fix waves |
+| | [`engg-debug`](skills/engg-debug/SKILL.md) | Find the root cause of a bug or slowdown | A reproduction, profiler evidence, the fix, and a regression test |
+| | [`engg-research`](skills/engg-research/SKILL.md) | Pick or upgrade a library, check an API | A dated research brief with sources, exact pins, and known vulnerabilities checked |
+| **Release** | [`engg-ship`](skills/engg-ship/SKILL.md) | Set up CI/CD, release, roll out | Machine-enforced gates, a pinned supply chain, feature-flagged rollouts with tested rollback |
 
 ```mermaid
 flowchart LR
-    A["engg-ideate<br/>Project Charter"] --> B["engg-architect<br/>Grill & Locked EDD"]
-    R["engg-roadmap<br/>Grill & Harden Existing Roadmap"] --> C["engg-plan<br/>MVP Waves & Atomic Chunks"]
-    B --> C
-    A --> R
-    C --> D["engg-build<br/>Strict TDD Chunk"]
-    C --> E["engg-extend<br/>Vertical Slice / Adapter"]
-    D --> F["engg-audit<br/>Adversarial P0-P3 Audit"]
-    E --> F
-    F -- "Fixes & Next Chunk" --> C
-    F -- "Clean & Verified" --> G["engg-ship<br/>CI/CD, IaC & Safe Rollout"]
-    X["engg-deep-audit<br/>Whole-Repo Audit vs. Contract"] --> C
-    C --> Y["engg-refactor<br/>Strip & Reorganise, Ratcheted"]
-    Y --> F
-
-    subgraph Specialists["On-Demand Specialists (Invoked at Any Stage)"]
-        H["engg-research<br/>Live Docs & Exact Pinning"]
-        I["engg-data<br/>Schemas & Zero-Downtime Migrations"]
-        J["engg-debug<br/>Evidence-Driven Profiling & Fixes"]
+    I[ideate] --> A[architect] --> P[plan]
+    R[roadmap] --> P
+    D[deep-audit] --> P
+    P --> B[build] --> AU[audit]
+    P --> E[extend] --> AU
+    P --> RF[refactor] --> AU
+    AU -- next chunk --> P
+    AU -- verified --> S[ship]
+    subgraph Any time
+        RS[research]
+        DB[debug]
+        DA[data]
     end
 ```
-
----
-
-## The 13-Skill Catalog
-
-| #   | Skill                                                | Stage           | What It Does                                                                                                                                                                      | When I Reach for It                                                                            |
-| --- | ---------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| 1   | **[`engg-ideate`](skills/engg-ideate/SKILL.md)**       | Ideation        | Pressure-tests raw concepts, compares 2–3 approaches, exposes fatal risks, and locks a V1 **Project Charter** with explicit non-goals.                                            | Starting from a blank page or evaluating whether an idea is worth building.                    |
-| 2   | **[`engg-roadmap`](skills/engg-roadmap/SKILL.md)**     | Roadmap         | Reality-checks an existing roadmap against actual code, grills scope with a 50% Timeline Razor, re-sequences risk-first, and routes every milestone to the right execution skill. | Tightening an in-progress product roadmap, cutting bloat, or accelerating a stalled repo.      |
-| 3   | **[`engg-architect`](skills/engg-architect/SKILL.md)** | Architecture    | Runs a 3–5 round Staff-level Grill Session with zero hand-waving and locks a decision-complete **Engineering Design Doc (EDD)** + ADRs.                                           | Greenfield systems, golden templates, or major new subsystems before writing code.             |
-| 4   | **[`engg-plan`](skills/engg-plan/SKILL.md)**           | Planning        | Breaks any EDD, hardened roadmap milestone, or audit backlog into MVP-first progressive Waves and thin vertical **Atomic Chunks** (1–5 files each).                               | Turning an approved design or next milestone into an executable build queue.                   |
-| 5   | **[`engg-build`](skills/engg-build/SKILL.md)** | Build & TDD | Implements one chunk at a time via strict **Red → Green → Refactor**, with test depth set by **risk tier** (T1 boundaries … T3 all five categories plus mutation testing) and the architecture contract part of green. | Building new behaviour or fixing a defect, test-first. |
-| 6   | **[`engg-extend`](skills/engg-extend/SKILL.md)**       | Evolution       | **Mode A:** Adds a vertical feature slice matching repo conventions. **Mode B:** Adds/swaps an adapter behind a port with **shared LSP contract tests**.                          | Growing an existing repo cleanly or swapping DBs, caches, queues, SDKs, or UI/engine backends. |
-| 7   | **[`engg-audit`](skills/engg-audit/SKILL.md)**         | Review & Harden | **Mode A:** Mandatory post-chunk/PR audit. **Mode C:** Audits & tightens specs/plans written by another LLM. (Whole codebases: `engg-deep-audit`.)                                 | Before every commit or merge, or validating another model's plan.                              |
-| 8   | **[`engg-deep-audit`](skills/engg-deep-audit/SKILL.md)** | Codebase Audit | Maps the whole repo with open-source tools, then reviews it **layer by layer, unit by unit** against the architecture contract, with progress on disk. Emits a strip list, move list, and remediation waves. | Onboarding onto a messy repo, measuring drift from the architecture, or planning a cleanup. |
-| 9   | **[`engg-refactor`](skills/engg-refactor/SKILL.md)**   | Cleanup         | Executes cleanup waves safely: characterization tests first, two-signal deletion re-checked at HEAD, moves/splits/merges toward the contract, and a **ratchet** so violations only go down. | Stripping dead code and reorganising a messy repo layer by layer, one reversible commit at a time. |
-| 10  | **[`engg-research`](skills/engg-research/SKILL.md)** | Verification | Live lookups only: docs via only-cli (`oc`), versions and peer ranges via registry CLIs, OSV advisories, repo health, live-resolved action SHAs and image digests, in a **dated research brief**. | Picking libraries, upgrading major versions, or checking current API signatures. |
-| 11  | **[`engg-debug`](skills/engg-debug/SKILL.md)**         | Diagnostics     | Scientific debugging & profiling loop (Reproduce → Measure → Hypothesize → Isolate → Root-Cause Fix → Regression Test).                                                           | Hunting races, memory leaks, p99 spikes, Web Vitals jank, mobile ANRs, or game frame drops.    |
-| 12  | **[`engg-data`](skills/engg-data/SKILL.md)**           | Persistence     | Schema modeling, index design, `EXPLAIN ANALYZE` verification, throttled backfills, and **zero-downtime expand-and-contract migrations**.                                         | Touching databases, writing migrations, or eliminating slow queries and lock hazards.          |
-| 13  | **[`engg-ship`](skills/engg-ship/SKILL.md)** | Release & Ops | Machine-enforced CI gates (contract + ratchet), **SHA-pinned supply chain** with actionlint/zizmor and SLSA provenance, merge queues, feature-flagged progressive rollouts, tested rollbacks, and **all five DORA metrics**. | Setting up CI/CD, containerizing, releasing safely, or writing rollback runbooks. |
-
----
 
 ## Which Skill When
 
@@ -98,222 +137,99 @@ Each request has exactly one skill. When two seem to fit, the right column decid
 
 ---
 
-## Delivery Modes: Ask First, Then Stay in Lane
+## Day-to-day use
 
-Before planning or building, the skills ask what kind of result you want, and record it in `.engg/delivery.yaml` so no later session guesses:
+You can call a skill by name (`/engg-plan …` in tools with slash commands), or just describe the task and let the agent pick the matching skill. Below are the situations you'll meet most, and what happens in each. Copy-paste prompts for all of them are in [docs/WORKFLOWS.md](docs/WORKFLOWS.md).
 
-| Mode | You get | Best when |
+### Starting something new
+
+1. **`/engg-ideate`** "I want to build ___." The agent asks about the user, the problem and what success looks like. It compares two or three approaches and names the assumptions that would kill the idea. You get a charter with a sharp V1 and explicit non-goals.
+2. **Delivery mode.** You're asked `mvp-first` or `full-sequence`. For a new idea, `mvp-first` is usually right, with the core flow written down.
+3. **`/engg-architect`**: a few rounds of focused questions, then a design doc, decision records, and `.engg/architecture.yaml`, compiled into a real checker.
+4. **`/engg-plan`**: Wave 1 is the walking skeleton. That's the harness, CI and pre-commit, plus the core flow end to end.
+5. **`/engg-build` chunk by chunk:** tests first, then code; the gates must pass; then `/engg-audit` on the diff before you commit.
+
+### Your project exists and you're adding the next feature
+
+The architecture and tooling are already set, so the baseline is `existing` and the agent builds within them.
+- **A feature that fits an existing pattern:** **`/engg-extend`**. It finds the closest existing slice with the code graph and copies its conventions.
+- **New behaviour with no pattern yet:** **`/engg-build`**.
+- **Either way:** **`/engg-audit`** on the diff before merging. If the agent notices something worth improving outside the chunk, it goes in the backlog, not into your diff.
+
+### You inherited a messy codebase, or want an honest check-up
+
+1. **`/engg-deep-audit`**. The agent maps the repo with tools first: size, complexity, duplication, dead code, secrets in history, vulnerable dependencies, and architecture violations. Then it reviews one bounded unit at a time, inner layers first, saving progress to disk so a long audit can resume. If there's no architecture contract yet, it drafts one from what exists and asks you to confirm it.
+2. **What you get:** a scorecard, severity-ranked findings, a **strip list** (safe to delete, with evidence), a **move list** (code in the wrong place), and fix waves. It also says plainly what it did *not* check.
+3. **`/engg-plan`** turns the waves into chunks, and **`/engg-refactor`** works through them. It pins current behaviour with tests first, deletes only on fresh evidence, and the ratchet goes down with every commit.
+
+### Something is broken or slow
+
+**`/engg-debug`**. No guess-patching: it reproduces the problem, measures it, tests its hypotheses (`git bisect run` for regressions), and only then fixes it, with a regression test. Speed claims come with before/after numbers from repeated runs.
+
+### Changing the database
+
+**`/engg-data`**. Migrations are split into backward-compatible steps (expand, backfill, switch, contract) and linted for lock safety. Query plans are checked on realistic data volumes, and backfills can resume after a crash.
+
+### Picking or upgrading a library
+
+**`/engg-research`**. Versions, compatibility ranges and advisories are checked live, never recalled, and you get a dated brief with sources. The same goes for CI actions, which are pinned to exact commit SHAs.
+
+### Releasing
+
+**`/engg-ship`**: required CI checks (including the architecture contract and the ratchet), pinned and linted workflows, an SBOM and signed provenance, a merge queue when it's busy, feature-flagged rollouts, a rollback you've tested, and your DORA delivery metrics.
+
+### What lands in your repository
+
+| Path | What it is | Commit it? |
 |---|---|---|
-| **`mvp-first`** | The core flow working end-to-end quickly, with everything critical (security, contract, tests at tier, CI) done properly. Then small increments: features, improvements, fixes. | The idea is unproven, there's a demo or deadline, or the scope is still moving |
-| **`full-sequence`** | Every planned part built one by one, each complete and polished before the next | Fixed, well-understood scope; libraries, platforms, infrastructure |
-
-**The baseline rule:** if a project already has an architecture and tooling, they're **fixed**. Skills build within them, and log improvements to a backlog instead of redesigning, re-laying-out or swapping tools. Only an explicit "redo it" (`baseline: redo`) opens a redesign. Neither mode ever relaxes security, the architecture contract, tests-first at the risk tier, or the Evidence Protocol: `mvp-first` cuts scope, never quality. Full rules: [`shared/references/delivery-modes.md`](shared/references/delivery-modes.md).
-
----
-
-## Supported Engineering Surfaces
-
-Domain-specific profiles live inside `references/` so the exact same skills adapt natively across every stack:
-
-| Surface                   | Architectural Focus                                               | Key Budgets & Checks Enforced                                                                               |
-| ------------------------- | ----------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| **Backend & Distributed** | Hexagonal (`transport -> service -> domain -> ports <- adapters`) | p95/p99 latency, idempotency, tenant isolation (anti-IDOR), SSRF guards, SIGTERM draining                   |
-| **Web Client**            | Atomic UI + Feature-Sliced domain separation                      | Core Web Vitals (LCP/INP/CLS), bundle caps, WCAG AA accessibility, `AbortController`, XSS/CSP               |
-| **Mobile Client**         | Clean MVVM / MVI + Unidirectional Data Flow (UDF)                 | 16.6ms/8.3ms frames, zero main-thread I/O, offline sync, process-death restore, Keychain/Keystore           |
-| **Game Client**           | Fixed-timestep simulation decoupled from rendering; ECS/FSM       | Hard frame-time & zero per-frame GC allocations, object pooling, atomic versioned saves, server authority   |
-| **Database & Data**       | Schema-first contracts, OLTP vs. OLAP separation                  | Lock timeouts, `CONCURRENTLY` indexes, keyset pagination, `EXPLAIN (ANALYZE, BUFFERS)`, expand-and-contract |
-| **Infra & DevOps**        | Modular declarative IaC, immutable artifacts                      | Least-privilege IAM/OIDC, non-root read-only containers, pinned digests/SHAs, canary & tested rollbacks     |
+| `.engg/delivery.yaml` | Your delivery mode, baseline and core flow | Yes |
+| `.engg/architecture.yaml` | The architecture contract | Yes |
+| `.engg/generated/` | Checker configs compiled from the contract | Yes |
+| `.engg/baseline/violations.json` | The ratchet baseline | Yes |
+| `.engg/toolchain.lock` | The tool versions you approved | Yes |
+| `.engg/audit/<run>/` | A deep audit's map, ledger, findings and report | No (local) |
 
 ---
 
-## How I Use It (Real Workflows & Why)
-
-I don't invoke all 13 skills on every task—I compose them into **4 repeatable loops** depending on what I'm doing. (See [`docs/WORKFLOWS.md`](docs/WORKFLOWS.md) for the complete prompt cookbook.)
-
-### 1. Accelerating an In-Progress Project (Roadmap Grill → Ship)
-
-> **Why:** In-progress repos accumulate bloated roadmaps, hidden prerequisites, and fragile untested seams. Grilling the roadmap against the _real codebase_ cuts weeks of wasted effort before writing another line.
-
-1. Keep your roadmap in `docs/ROADMAP.md`.
-2. **Grill & harden it:**
-   ```text
-   /engg-roadmap Audit docs/ROADMAP.md against the current repository state.
-   Run your interactive grill rounds to expose reality gaps, cut scope bloat, and re-sequence risk-first, then emit the Tightened Roadmap Delta and Suite Routing Matrix.
-   ```
-3. **Chunk only the next active milestone:**
-   ```text
-   /engg-plan Break Milestone 1 from the hardened docs/ROADMAP.md into MVP-first Wave 1 and Wave 2 atomic chunks.
-   ```
-4. **Ship chunk by chunk:**
-   ```text
-   /engg-build Execute Chunk 1 using strict TDD (5-category test matrix first), then run /engg-audit (Mode A) before I commit.
-   ```
-
-### 2. Building a Greenfield Project from Zero
-
-> **Why:** Prevents architectural debt, premature complexity, and unverified stack choices from getting baked into day-one scaffolding.
-
-`engg-ideate` → `engg-architect` _(+ `engg-research`)_ → `engg-plan` → **[`engg-build` → `engg-audit`]** _(repeat per chunk)_ → `engg-ship`
-
-### 3. Tightening an Existing Codebase or Another LLM's Spec
-
-> **Why:** Refactors without safety-net tests break production, and plans drafted by other models often hide missing trust boundaries, unbounded queries, or stale API versions.
-
-- **Existing repo/module:** `/engg-deep-audit Audit this repo against .engg/architecture.yaml, layer by layer. Give me the scorecard, strip list, move list, and remediation waves.`
-- **External spec/plan:** `/engg-audit Run Mode C on docs/proposal.md — flag every missing budget, security gap, stale tech claim, and over-engineered piece with a Tightened Spec Delta.`
-
-### 4. Daily Specialist Loops
-
-- **Adding a feature or swapping a DB/SDK:** `/engg-extend` (Mode A for vertical slices, Mode B for port adapters with shared contract tests) → `/engg-audit`
-- **Fixing a nasty bug or slow path:** `/engg-debug` (forces reproduction + profiler evidence before touching code) → regression test → `/engg-audit`
-- **Changing a production database schema:** `/engg-data` (expand-and-contract safety checklist + query plan check) → `/engg-audit`
-- **Shipping to production:** `/engg-ship` (fast-fail CI gates, hardened container/IaC, Production Readiness Gate, verified rollback)
-
----
-
-## Installation & IDE/CLI Setup
-
-### Where Each Tool Discovers Skills
-
-| Tool                                    | Project Scope (Git-tracked in your repo)                            | Global Scope (Available in every project) |
-| --------------------------------------- | ------------------------------------------------------------------- | ----------------------------------------- |
-| **Antigravity IDE**                     | `<repo>/.agents/skills/<skill>/`                                    | `~/.gemini/config/skills/<skill>/`        |
-| **Antigravity CLI**                     | `<repo>/.agents/skills/<skill>/`                                    | `~/.gemini/config/skills/<skill>/`        |
-| **Claude Code CLI**                     | `<repo>/.claude/skills/<skill>/` _(symlinked to `.agents/skills/`)_ | `~/.claude/skills/<skill>/`               |
-| **Codex / Cursor / Copilot / OpenCode** | `<repo>/.agents/skills/<skill>/` _(open standard)_                  | Tool-specific global skills folder        |
-
-> **Single-Source-of-Truth Pattern:** The installer stores one canonical copy (`.agents/skills/` for project scope, or `~/.engg-skills-suite/skills/` for global scope) and symlinks it into tool-specific paths so updating one file updates **every CLI and IDE simultaneously**.
-
----
-
-### Quick Install (Automated Scripts)
-
-#### macOS / Linux
+## Install
 
 ```bash
 git clone https://github.com/devnadeemashraf/engg-skills-suite.git
 cd engg-skills-suite
-chmod +x install.sh
-
-# Option 1: Install globally across Claude Code CLI + Antigravity CLI + Antigravity IDE
-./install.sh --global
-
-# Option 2: Install directly into an active project repo
-./install.sh --project /path/to/your-project
+./install.sh --global                         # macOS / Linux: every project on this machine
+./install.sh --project /path/to/your-repo     # or just one repository
 ```
-
-_Options: `--copy` (copy files instead of symlinking), `--dry-run` (show what would change), `--uninstall` (remove only this suite's skills; anything else in those folders is left alone)._
-
-#### Windows (PowerShell)
 
 ```powershell
-git clone https://github.com/devnadeemashraf/engg-skills-suite.git
-cd engg-skills-suite
-
-# Option 1: Global install
-.\install.ps1 -Scope Global
-
-# Option 2: Project-scoped install
-.\install.ps1 -Scope Project -ProjectPath "C:\path\to\your-project"
+.\install.ps1 -Scope Global                                   # Windows
+.\install.ps1 -Scope Project -ProjectPath "C:\path\to\repo"
 ```
 
-_Options: `-Copy`, `-DryRun`, `-Uninstall` (same behaviour as the shell installer). Links are symbolic links when Windows allows them (Developer Mode or admin), otherwise directory junctions, which need no special rights. On Windows, use `install.ps1` rather than `install.sh` under Git Bash: Git Bash's `ln -s` silently makes copies unless native symlinks are enabled._
+**[Full setup guide →](docs/SETUP.md)** covers each tool (Claude Code, Codex, Cursor, Copilot, Antigravity, web chats), verifying the install, your first session, the optional open-source tools, updating, uninstalling and troubleshooting.
 
----
-
-### How to Use in Your Favorite IDE / CLI
-
-- **Claude Code CLI:**
-  1. Verify install: type `/` to browse available skills, or ask `"What skills do you have?"`.
-  2. Invoke explicitly with slash commands (`/engg-roadmap`, `/engg-build`, `/engg-audit`) or let Claude auto-activate them from natural requests.
-- **Antigravity CLI:**
-  1. Start a session and run `/skills` to confirm all 13 `engg-*` skills are loaded.
-  2. Invoke via `/engg-roadmap`, `/engg-plan`, `/engg-build`, etc., or reference the skill by name.
-- **Antigravity IDE:**
-  1. Open your workspace (restart the window once after a fresh global install).
-  2. Type `/` in the Agent Panel to browse and trigger any `engg-*` skill directly—or ask naturally (e.g., _"Use engg-deep-audit to audit this service layer by layer"_).
-- **Cursor / Codex CLI / GitHub Copilot / OpenCode:**
-  - Run `./install.sh --project /path/to/your-project`—all modern open-spec agents automatically discover `<repo>/.agents/skills/<skill>/SKILL.md`.
-- **Any Web LLM (Chat UI without filesystem skill discovery):**
-  - Upload or paste the specific `skills/<skill>/SKILL.md` plus its `references/*.md` files into a Project/Gem/Custom GPT instruction set, or attach the relevant skill folder when starting a session.
-
----
-
-## Architecture as a Machine-Checked Contract
-
-`engg-architect` writes the agreed architecture to `.engg/architecture.yaml` in your repo: layers, which layer may import which, external-package limits, and feature-module isolation. `compile_contract.py` turns it into the native checker for your stack, so the same rules run in the editor, pre-commit, and CI:
-
-| Stack | Checker generated |
-|---|---|
-| TypeScript / JavaScript | dependency-cruiser |
-| Python | import-linter |
-| Go | go-arch-lint |
-
-Every compile prints a **coverage report**. A rule a checker can't express is reported as *not covered*, never silently dropped. The schema is documented in [`shared/references/architecture-contract.md`](shared/references/architecture-contract.md).
-
----
-
-## Open-Source Toolchain (Asked, Never Assumed)
-
-Skills lean on free, open-source tools wherever a tool is faster, cheaper in tokens, or more accurate than reading code by hand. Examples: a code knowledge graph (graphify), compact web reading (only-cli), architecture rule checkers, dead-code and duplication finders, secret and vulnerability scanners.
-
-- **Registry:** [`shared/references/toolchain.md`](shared/references/toolchain.md) lists each tool's job, licence, user-scoped install command, and what is lost without it.
-- **Detection:** `toolcheck.sh` / `toolcheck.ps1` report what's installed. They never install anything.
-- **Consent:** [`shared/references/tool-consent.md`](shared/references/tool-consent.md). A skill asks once, explains why each tool helps and what data (if any) leaves your machine, verifies the package live, prefers easy-to-undo installs, and records versions in `.engg/toolchain.lock`.
-
----
-
-## Repository Structure
+## Repository layout
 
 ```text
-engg-skills-suite/
-├── .github/workflows/validate.yml   # CI: validator, tests, linters, installers on 3 OSes
-├── docs/
-│   ├── WORKFLOWS.md                 # End-to-end prompt recipes & chaining patterns
-│   └── V2_PLAN.md                   # The v2 refactor plan and rollout phases
-├── shared/                          # Single source of truth for files several skills use
-│   ├── manifest.yaml                # Which skills receive which shared files
-│   ├── references/                  # Constitution, toolchain registry, tool consent protocol
-│   └── scripts/                     # toolcheck.sh/.ps1 (tool detection), compile_contract.py
-├── skills/
-│   ├── engg-ideate/                  # Idea framing & Project Charter
-│   ├── engg-roadmap/                 # Existing roadmap grilling, reality-check & routing
-│   ├── engg-architect/               # Staff-level Grill Session & locked EDD/ADRs
-│   ├── engg-plan/                    # MVP-first Waves & Atomic Chunk decomposition
-│   ├── engg-build/                   # Strict TDD (5-category Test Matrix) chunk builder
-│   ├── engg-extend/                  # Vertical slices & contract-tested swappable adapters
-│   ├── engg-audit/                   # Adversarial P0-P3 audit of a diff/PR or an external spec
-│   ├── engg-deep-audit/              # Tool-driven, layer-by-layer audit of a whole codebase
-│   ├── engg-refactor/                # Safe cleanup: characterization tests, two-signal strips, ratchet
-│   ├── engg-research/                # Zero-memory-guessing live docs & version pinning
-│   ├── engg-debug/                   # Evidence-driven debugging & performance profiling
-│   ├── engg-data/                    # Schema design, query plans & zero-downtime migrations
-│   └── engg-ship/                    # CI/CD, IaC, containers, PRR & safe rollouts
-├── install.sh                       # macOS / Linux installer (Global & Project)
-├── install.ps1                      # Windows PowerShell installer (Global & Project)
-├── tools/validate_suite.py          # Agent Skills spec & suite-rule validator
-├── tools/sync_shared.py             # Copies shared/ into skills; --check fails CI on drift
-├── tools/pin_requirements.py        # Regenerates the hash-pinned requirements files
-├── tests/                           # Validator, sync, toolcheck & contract tests; fixture repos
-├── package.json                     # Dev-only Node tooling for contract tests (exact pins + lockfile)
-├── CONTRIBUTING.md                  # Authoring standards for extending the suite
-└── LICENSE                          # Apache-2.0
+skills/           the 13 skills: each a SKILL.md plus references/ and scripts/ it loads on demand
+shared/           single source for files several skills use (synced into skills/ by tools/sync_shared.py)
+  references/     engineering constitution, delivery modes, architecture contract, toolchain, tool consent
+  scripts/        compile_contract.py, ratchet.py, toolcheck.sh / toolcheck.ps1
+evals/            fixture repos with known defects, answer keys, a scorer, and recorded runs
+docs/             SETUP.md, WORKFLOWS.md, and the v2 design plan
+tools/            validator, shared-file sync, requirement pinning, tool-output capture
+tests/            tests for every script, the validator, the installers and the trigger table
+install.sh/.ps1   installers for macOS, Linux and Windows
 ```
 
----
+## Quality
 
-## Validation & Quality Gates
+The suite is held to its own standards:
+- every skill is validated against the Agent Skills spec
+- every script has tests that run the real tools (dependency-cruiser, import-linter) against fixture repos
+- CI runs on Linux, macOS and Windows, with actions pinned to commit SHAs, hash-pinned Python dependencies, and a rule that fails the build if any test is skipped
 
-Before pushing changes, run the validator and tests. The validator checks `agentskills.io` compliance (frontmatter parsed as real YAML, field limits, name matches folder), the line budget, resource files (broken, nested, or never referenced), self-contained skill folders, and vendor neutrality:
+See [CONTRIBUTING.md](CONTRIBUTING.md) to add or change a skill.
 
-```bash
-python -m venv .venv && . .venv/bin/activate          # Windows: .venv\Scripts\activate
-python -m pip install --require-hashes -r requirements-dev.txt
-npm ci --ignore-scripts                               # Node 22+: dependency-cruiser for contract tests
-python tools/sync_shared.py --check
-python tools/validate_suite.py
-python -m pytest -q
-bash tests/installer_smoke.sh                         # Windows: .\tests\installer_smoke.ps1
-```
+## License
 
-GitHub Actions runs all of this on every push and pull request, plus shellcheck, actionlint, zizmor, PSScriptAnalyzer, and installer smoke tests on Linux, macOS, and Windows. Every action is pinned to a commit SHA and every Python dependency is hash-pinned. See [`.github/workflows/validate.yml`](.github/workflows/validate.yml).
+[Apache-2.0](LICENSE)
