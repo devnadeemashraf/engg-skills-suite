@@ -1,7 +1,7 @@
 # Cross-Stack Debugging & Profiling Playbooks
 
 ## 1. Backend Latency, Leaks & Concurrency
-- **Tools:** Language CPU/heap/goroutine/mutex profilers (`pprof`, `py-spy`, `async-profiler`, `perf`, Node `--cpu-prof`/`--heap-prof`), race detectors (`-race`, TSAN), distributed traces.
+- **Tools:** Language CPU/heap/goroutine/mutex profilers (`pprof`, `py-spy`, `async-profiler`, `perf` or `samply` for native code, Node `--cpu-prof`/`--heap-prof`), race detectors (`-race`, TSAN), distributed traces. For load reproductions, `k6` with scripted scenarios and thresholds.
 - **Top Suspects:** Unbounded goroutines/tasks, connection pool exhaustion, lock held across I/O, N+1 DB calls, JSON reflection on huge payloads, missing HTTP keep-alive, DNS/TLS handshake per request, high-cardinality metric OOMs.
 - **Rule:** Separate *on-CPU time* from *off-CPU wait time* (I/O, locks, scheduling) before optimizing.
 
@@ -28,3 +28,11 @@
 ## 6. Infrastructure & Containers
 - **Tools:** Container metrics (`cgroup` CPU throttling vs. OOMKill exit 137), kernel logs (`dmesg`), network packet/DNS checks, IaC state diff.
 - **Top Suspects:** Tight CPU limits causing CFS throttling latency spikes, memory leaks triggering OOMKill loops, misconfigured readiness probes causing traffic drops, DNS `ndots` amplification, ephemeral disk exhaustion.
+
+## 7. Evidence Table (required for every performance claim)
+
+| Metric | Baseline (median of N) | After (median of N) | Spread | Conditions |
+|---|---|---|---|---|
+| p99 latency, GET /orders | 840 ms (n=7) | 95 ms (n=7) | ±6% | same host, same 1M-row dataset, 200 rps for 60 s |
+
+Measure both sides under identical conditions. If the spread overlaps the change, there is no proven improvement.
