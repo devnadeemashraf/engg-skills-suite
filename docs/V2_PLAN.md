@@ -463,6 +463,18 @@ A run script records results per model. The release gate for 2.0.0 is: recall โ
 - **Generated configs go to `.engg/generated/`**, so they never overwrite a project's own `.dependency-cruiser.*` or `.importlinter`.
 - go-arch-lint output is verified structurally only; running the real binary in CI is a follow-up.
 
+### Phase 3 findings (2026-11-22)
+
+- **graphify import edges point at files, not symbols**, so "unreferenced symbol" from the graph alone was 18 candidates with many false hits. The map now requires a second signal (no other file mentions the name, and its own file mentions it only at its definition) and skips entry layers. That brought the list down to exactly the 4 truly dead functions, with zero on the clean fixture.
+- **gitleaks stores the secret itself in its JSON report unless run with `--redact`.** The recipe always redacts, and scans git history (`gitleaks git`) so deleted-but-committed secrets are caught.
+- **osv-scanner exits 128 when a repo has no lockfiles.** That isn't an error; the recipe records "not applicable".
+- **lizard's CSV has no header, and both lizard and jscpd report backslash paths on Windows, relative to the scanned folder.** The map normalises and resolves them; the recorded real outputs in the tests keep this covered.
+- **YAML reads an unquoted `TRUE` as a boolean**, which broke triage validation on the first hand-written findings file. Fixed, with a regression test.
+- `.git/info/exclude` keeps audit artefacts out of git without touching the project's `.gitignore`, so no permission is needed.
+- **The tools found defects the author hadn't listed.** dependency-cruiser flagged two real contract breaches in the messy fixture beyond the planted ones, and review found three more. The answer key now has 20 defects.
+- **Eval honesty:** the dry run's 100% recall was by the fixtures' author and only proves the pipeline. A fair recall number needs a fresh agent that has never seen the fixtures. The clean fixture's tool-level zero-false-alarm result is objective and runs in CI.
+- Scope: one language (TypeScript) of fixtures so far. The Python and Go fixtures from ยง10 are follow-ups.
+
 ## 12. Decisions needed from you
 
 1. **Names:** `engg-deep-audit` and `engg-refactor`? (Alternatives: `engg-xray`, `engg-conform`, `engg-restructure`.)
