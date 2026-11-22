@@ -3,7 +3,7 @@ name: engg-ideate
 description: Brainstorms, pressure-tests, and frames software product or engineering ideas into a sharp, decision-ready Project Charter. Use when exploring a new project idea, evaluating technical feasibility, carving an MVP scope, comparing build approaches, or turning a vague concept into structured requirements before architectural design.
 license: Apache-2.0
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---
@@ -34,6 +34,7 @@ Transform raw product or technical concepts into a clear, feasibility-tested **P
    - Generate **2 to 3 distinct product/technical approaches** (e.g., Thin MVP, Opinionated Power-Tool, Platform/Extensible Core).
    - Score each option against `references/ideation-rubric.md` (User Value, Technical Risk, Time-to-First-Signal, Differentiation, Maintenance Burden).
    - Call out the **Top 3 Fatal Risks** (assumptions that, if false, kill the project) and how to validate them cheaply.
+   - **Build vs. buy vs. open source:** for every non-differentiating capability (auth, billing, search, queues, flags, observability), name 1–2 concrete existing options, both open-source and hosted. Check each one live through `engg-research` (maintained, licence, health) before it goes in the charter.
 3. **Converge & Carve the V1 Slice:**
    - Select the winning direction with the user.
    - Define the **Walking Skeleton (V0)** and **Minimum Lovable Product (V1)** user journeys (max 3–5 core flows).
@@ -42,7 +43,7 @@ Transform raw product or technical concepts into a clear, feasibility-tested **P
    - Produce a concise, decision-complete **Project Charter** containing:
      - Problem Statement & Target Users
      - Chosen Approach & Rejected Alternatives (with rationale)
-     - Core V1 Journeys & Measurable Success Criteria
+     - Core V1 Journeys & Measurable Success Criteria: each criterion a number with a unit and a time window (e.g. "60% of trial users complete checkout within 7 days"), never an adjective like "fast" or "easy"
      - Explicit Non-Goals
      - Key Unknowns, Constraints & Validation Experiments
      - Target Surfaces & Initial Resource/Time Constraints
@@ -52,4 +53,5 @@ Transform raw product or technical concepts into a clear, feasibility-tested **P
 
 - **Solution-first bias:** Users often pitch a technical feature instead of a problem. Always trace back to the user outcome.
 - **Unbounded MVP:** An MVP with 15 features is not an MVP. Push aggressively until V1 fits a tight, shippable milestone.
-- **Ignoring build-vs-buy:** Never propose building auth, billing, search, or physics engines from scratch unless it is the core differentiator.
+- **Ignoring build-vs-buy:** Never propose building auth, billing, search, or physics engines from scratch unless it is the core differentiator. Name the open-source or hosted option you'd use instead, verified live.
+- **Unmeasurable success:** "users love it" can't be validated. If a criterion has no number and no way to collect it, rewrite it or cut it.
