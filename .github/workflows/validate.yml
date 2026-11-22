@@ -1,24 +1,93 @@
-name: Validate Engineering Skills Suite
+name: Validate
 
 on:
   push:
-    branches: [main, master]
+    branches: [main]
   pull_request:
 
-jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+# Least privilege: no job needs to write to the repository.
+permissions:
+  contents: read
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# Third-party actions are pinned to full commit SHAs (tags can be force-pushed; see CVE-2026-33634).
+jobs:
+  skills:
+    name: Skills & validator tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
         with:
           python-version: "3.12"
+      - name: Install pinned dev dependencies
+        run: python -m pip install --require-hashes -r requirements-dev.txt
+      - name: Validate skills against the spec and suite rules
+        run: python tools/validate_suite.py
+      - name: Run tests
+        run: python -m pytest -q
 
-      - name: Validate all skills against open spec & suite rules
-        run: python3 validate_suite.py
+  lint:
+    name: Lint scripts & workflows
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      ACTIONLINT_VERSION: "1.7.12"
+      ACTIONLINT_SHA256: "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7.1.0
+        with:
+          python-version: "3.12"
+      - name: shellcheck (preinstalled on the runner image)
+        run: shellcheck --version && shellcheck install.sh tests/*.sh
+      - name: actionlint (checksum-verified release binary)
+        run: |
+          archive="actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          curl -fsSLo "$archive" "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/${archive}"
+          echo "${ACTIONLINT_SHA256}  ${archive}" | sha256sum --check --strict
+          tar -xzf "$archive" actionlint
+          ./actionlint -color
+      - name: zizmor (GitHub Actions security audit)
+        run: |
+          python -m pip install --require-hashes -r requirements-lint.txt
+          zizmor --offline .github/workflows
 
-      - name: Syntax-check installer script
-        run: bash -n install.sh
+  installers:
+    name: Installers (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: install.sh smoke test
+        if: runner.os != 'Windows'
+        run: bash tests/installer_smoke.sh
+      - name: install.ps1 smoke test (PowerShell 7)
+        shell: pwsh
+        run: ./tests/installer_smoke.ps1
+      - name: install.ps1 smoke test (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: ./tests/installer_smoke.ps1
+      - name: PSScriptAnalyzer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Force -Repository PSGallery
+          $results = Invoke-ScriptAnalyzer -Path install.ps1, tests/installer_smoke.ps1 -Settings ./PSScriptAnalyzerSettings.psd1
+          $results | Format-Table -AutoSize
+          if ($results | Where-Object Severity -in 'Error', 'Warning') { throw "PSScriptAnalyzer found issues" }
