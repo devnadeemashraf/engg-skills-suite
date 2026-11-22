@@ -26,3 +26,9 @@ groups:
       - engg-research
       - engg-roadmap
       - engg-ship
+
+  architecture-contract:
+    files:
+      - references/architecture-contract.md
+      - scripts/compile_contract.py
+    skills: [engg-architect, engg-audit, engg-extend]

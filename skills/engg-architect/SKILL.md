@@ -26,6 +26,7 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
 4. **Verify live versions when selecting a stack:** If concrete libraries/frameworks/runtimes are chosen, invoke `engg-research` (or verify against current docs) rather than guessing versions from memory.
 5. **Enforce design invariants:** Every EDD must explicitly codify SOLID, DRY, KISS, ATOMIC boundaries, Hexagonal/Clean dependency flow, explicit contracts, security controls, and hard resource/performance budgets.
 6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+7. **Architecture is a machine-checked contract, not just a diagram:** every locked EDD ships with `.engg/architecture.yaml` written to the schema in `references/architecture-contract.md`. Compile it with `scripts/compile_contract.py` and never hand-write enforcer configs.
 
 ## Workflow
 
@@ -51,7 +52,12 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
    - Observability, Testing Strategy & Lifecycle/Deployment Model
    - Architecture Decision Records (ADRs) for every major irreversible choice
    - Recorded Assumptions & Accepted Trade-Offs
-5. **Approval Gate:** Ask the user to explicitly approve or revise the EDD. Upon approval, hand off to `engg-plan` to decompose the EDD into MVP-first execution chunks.
+5. **Write and Compile the Architecture Contract:**
+   - Translate the module architecture into `.engg/architecture.yaml`: layers inner -> outer, minimal `may_import`, `external` limits on the domain, `modules` isolation for vertical slices, and `targets` for the chosen stack.
+   - **Brownfield:** first draft the as-is contract from the directory layout and the dependency graph (graphify or the native enforcer). Agree the to-be contract with the owner, and record the gap as a migration delta. Existing violations become a ratchet baseline; never loosen the contract to hide them.
+   - Run `scripts/compile_contract.py` and show its coverage report. Any rule marked NOT COVERED for a target must appear in the EDD with how it will be checked instead.
+   - Run the generated enforcer once and report the result (clean, or the violation count for the baseline).
+6. **Approval Gate:** Ask the user to explicitly approve or revise the EDD and the contract. Upon approval, hand off to `engg-plan` to decompose the EDD into MVP-first execution chunks. Wiring the enforcer into pre-commit and CI belongs in Chunk 1.
 
 ## Gotchas
 
