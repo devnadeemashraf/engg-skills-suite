@@ -88,6 +88,9 @@ jobs:
         shell: pwsh
         run: |
           Install-Module PSScriptAnalyzer -RequiredVersion 1.25.0 -Scope CurrentUser -Force -Repository PSGallery
-          $results = Invoke-ScriptAnalyzer -Path install.ps1, tests/installer_smoke.ps1 -Settings ./PSScriptAnalyzerSettings.psd1
+          # -Path accepts a single path, so analyse each script in turn.
+          $results = foreach ($script in 'install.ps1', 'tests/installer_smoke.ps1') {
+            Invoke-ScriptAnalyzer -Path $script -Settings ./PSScriptAnalyzerSettings.psd1
+          }
           $results | Format-Table -AutoSize
           if ($results | Where-Object Severity -in 'Error', 'Warning') { throw "PSScriptAnalyzer found issues" }
