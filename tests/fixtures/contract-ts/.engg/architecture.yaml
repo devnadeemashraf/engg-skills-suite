@@ -1,0 +1,28 @@
+# Fixture: a small hexagonal TypeScript service. Tests copy this repo and plant violations.
+version: 1
+name: fixture-shop-ts
+style: hexagonal
+layers:
+  - name: domain
+    paths: ["src/*/domain/**"]
+    may_import: []
+    external: [zod]
+  - name: application
+    paths: ["src/*/app/**", "src/*/index.ts"]
+    may_import: [domain]
+    external: none
+  - name: adapters
+    paths: ["src/*/adapters/**"]
+    may_import: [domain, application]
+  - name: composition
+    paths: ["src/main.ts"]
+    may_import: ["*"]
+modules:
+  paths: "src/*"
+  public_entry: [index.ts]
+rules:
+  no_cycles: true
+limits:
+  max_file_lines: 400
+targets:
+  typescript: {}

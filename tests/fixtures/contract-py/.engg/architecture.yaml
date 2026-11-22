@@ -1,0 +1,25 @@
+# Fixture: a small hexagonal Python service. Tests copy this repo and plant violations.
+version: 1
+name: fixture-shop-py
+style: hexagonal
+layers:
+  - name: domain
+    paths: ["src/shop/*/domain/**"]
+    may_import: []
+    external: none
+  - name: application
+    paths: ["src/shop/*/app/**"]
+    may_import: [domain]
+  - name: adapters
+    paths: ["src/shop/*/adapters/**"]
+    may_import: [domain, application]
+  - name: composition
+    paths: ["src/shop/main.py"]
+    may_import: ["*"]
+modules:
+  paths: "src/shop/*"
+  public_entry: [__init__.py]
+rules:
+  no_cycles: true
+targets:
+  python: { root_package: shop, source_root: src }
