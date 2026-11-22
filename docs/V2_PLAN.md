@@ -500,6 +500,13 @@ A run script records results per model. The release gate for 2.0.0 is: recall â‰
   - engg-data's risk-tier reference was briefly broken, because a validator failure was swallowed by `| head`; folded into one green commit.
 - Running `npx --yes squawk-cli` to check flags was refused by the harness: it would have installed a package without consent. squawk's usage was taken from its README instead, which is the right call under the tool consent protocol.
 
+### Delivery modes (added before 2.0.0, 2026-11-23)
+
+- New `shared/references/delivery-modes.md`, given to the eight skills that plan or build. It asks once per effort for **`mvp-first`** (core flow end-to-end, then increments) or **`full-sequence`** (everything in order), with a recommendation, and records the answer in `.engg/delivery.yaml`.
+- It also covers the **baseline**: `greenfield`, `existing` or `redo`. With `existing`, the architecture and tooling are fixed, and improvements go to the plan's backlog instead of into chunks. Only an explicit `redo` opens a redesign.
+- Neither mode relaxes security, the contract and ratchet, tests at tier, or the Evidence Protocol.
+- `tests/test_triggers.py` checks that every planning and building skill references the file and that its example stays valid; proven to fail when a rule is removed.
+
 ## 12. Decisions needed from you
 
 1. **Names:** `engg-deep-audit` and `engg-refactor`? (Alternatives: `engg-xray`, `engg-conform`, `engg-restructure`.)
