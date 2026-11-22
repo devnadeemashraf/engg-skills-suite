@@ -76,7 +76,7 @@ Tools build the map; you judge only what tools can't. Reading thousands of lines
 
 **Phase 7: Enforcement handoff**
 - Propose (don't apply) wiring the compiled enforcer, gitleaks, and the formatter and linter into pre-commit and CI.
-- Record today's violations as the ratchet baseline, so new ones block merges while old ones are paid down wave by wave.
+- Propose recording today's violations as the ratchet baseline with `python scripts/ratchet.py record --baseline .engg/baseline/violations.json --depcruise $RUN/raw/depcruise.json --gitleaks $RUN/raw/gitleaks.json`, so new violations block merges while old ones are paid down wave by wave (`engg-refactor` runs the waves).
 
 ## Gotchas
 
