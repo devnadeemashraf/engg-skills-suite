@@ -475,6 +475,14 @@ A run script records results per model. The release gate for 2.0.0 is: recall �
 - **Eval honesty:** the dry run's 100% recall was by the fixtures' author and only proves the pipeline. A fair recall number needs a fresh agent that has never seen the fixtures. The clean fixture's tool-level zero-false-alarm result is objective and runs in CI.
 - Scope: one language (TypeScript) of fixtures so far. The Python and Go fixtures from §10 are follow-ups.
 
+### Phase 4 findings (2026-11-22)
+
+- **Exit criterion met:** Waves 1–2 executed on ts-messy-api in 12 small commits. Tests went 0 → 22, green after every commit; the ratchet went 8 → 5; the 3 P0s were fixed test-first; 4 dead items were removed on fresh two-signal checks. Full record: `evals/runs/2026-11-22-refactor-waves-1-2.md`.
+- **Behaviour changes are separate from refactors.** HARDEN findings are `fix:` commits written test-first (the pinned-bug test is flipped and seen red), never mixed into `refactor:` or `chore:` commits.
+- **`ratchet.py check --require-tight`** (new) fails CI when a fix lands without its baseline shrink. It was added after the run let one shrink slip a commit.
+- **Cleanups need type-check and lint gates:** an unused import left by a deletion went uncaught until checked by hand.
+- **Ratchet secrets against the working tree, audit them against history:** history keeps a secret until it is rotated.
+
 ## 12. Decisions needed from you
 
 1. **Names:** `engg-deep-audit` and `engg-refactor`? (Alternatives: `engg-xray`, `engg-conform`, `engg-restructure`.)

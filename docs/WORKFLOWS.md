@@ -62,13 +62,19 @@ Fix every P0 and P1 finding with regression tests, re-run verification, and draf
 ```text
 /engg-deep-audit Audit <directory or entire repo> against .engg/architecture.yaml, layer by layer.
 (No contract yet? It will offer to draft the as-is contract and hand off to /engg-architect first.)
-Produce the 6-pillar health scorecard, severity-ranked P0-P3 findings, and a strangler-fig hardening plan starting with characterization tests before any risky refactors.
+Produce the 7-pillar scorecard, severity-ranked P0-P3 findings, the strip list, the move list, and remediation waves.
 ```
 
 Then convert the remediation plan into chunks:
 
 ```text
-/engg-plan Turn the deep-audit REPORT.md into remediation Waves (Wave 1: safety-net tests + P0 blockers; Wave 2: P1 bounds/leaks/perf; Wave 3: P2 architectural cleanup).
+/engg-plan Turn the deep-audit REPORT.md into chunks per wave (Wave 1: safety-net tests + P0 fixes + ratchet; Wave 2: strip list; Wave 3: P1 hardening; Wave 4: moves toward the contract, inside-out; Wave 5: P2/P3 simplification).
+```
+
+Then execute each wave safely:
+
+```text
+/engg-refactor Execute Wave 1 from the plan: characterization tests on every hotspot first (prove they can fail), record the ratchet baseline, then the P0 fixes test-first. One commit per finding, with the gates green after each.
 ```
 
 ---
