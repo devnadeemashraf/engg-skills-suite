@@ -17,3 +17,6 @@ __pycache__/
 *.zip
 *.tar.gz
 dist/
+
+# Node dev tooling (tests only)
+node_modules/
