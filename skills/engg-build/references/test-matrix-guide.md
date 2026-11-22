@@ -1,6 +1,15 @@
 # 5-Category Test Matrix Guide
 
-Before writing implementation code for any chunk, enumerate concrete test cases in all five categories. Adapt examples to the active surface.
+Before writing implementation code for any chunk, enumerate concrete test cases for the categories its risk tier requires. Adapt the examples to the active surface.
+
+| Tier | Required categories | Extra proof |
+|---|---|---|
+| T0 | none (formatter and linter only) | none |
+| T1 | 1 Happy path, 2 Boundaries | none |
+| T2 | all five | contract tests at every port |
+| T3 | all five | mutation testing on changed code: no surviving non-equivalent mutants |
+
+**Property-based tests** belong in category 2 whenever the input space is large: parsers, serializers, money arithmetic, sorting/merging, state machines. Write the property ("decode(encode(x)) == x", "total is always an integer number of cents") and let the tool hunt for the counterexample.
 
 ## 1. Standard / Happy Path
 - Core functional behaviors with typical valid inputs and realistic configurations.
@@ -31,3 +40,7 @@ Before writing implementation code for any chunk, enumerate concrete test cases 
 - Mass assignment / over-posting protected fields (`role`, `tenant_id`, `is_admin`, currency/inventory tampering).
 - Oversized bodies, deep nesting, rate-limit exhaustion, injection payloads (SQL/NoSQL/HTML/XSS/Command/Log injection), SSRF internal IP targets.
 - Secret/PII scrubbing verification: inspect captured logs and error outputs to prove zero sensitive values leak.
+
+## Proving the tests can fail
+
+A test that can't fail proves nothing. For every new suite, break the production code once on purpose, or run a mutation tool on it, and see the suite go red. Check the break actually applied (`git diff --stat` shows a change) before trusting the result.
