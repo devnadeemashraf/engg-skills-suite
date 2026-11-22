@@ -1,0 +1,22 @@
+[
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 4,
+  "EndLine": 4,
+  "StartColumn": 15,
+  "EndColumn": 69,
+  "Match": "payment_api_secret = \"REDACTED\"",
+  "Secret": "REDACTED",
+  "File": "src/config.ts",
+  "SymlinkFile": "",
+  "Commit": "41a3dd732a391719f583195d387eef3a59969f24",
+  "Entropy": 5,
+  "Author": "eval",
+  "Email": "eval@example.test",
+  "Date": "2026-11-22T16:58:20Z",
+  "Message": "fixture",
+  "Tags": [],
+  "Fingerprint": "41a3dd732a391719f583195d387eef3a59969f24:src/config.ts:generic-api-key:4"
+ }
+]

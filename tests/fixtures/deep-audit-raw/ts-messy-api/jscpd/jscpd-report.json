@@ -1,0 +1,109 @@
+{
+  "duplicates": [
+    {
+      "firstFile": {
+        "end": 15,
+        "endLoc": {
+          "column": 15,
+          "line": 15,
+          "position": 463
+        },
+        "name": "orders\\app\\cancel-order.ts",
+        "start": 4,
+        "startLoc": {
+          "column": 0,
+          "line": 4,
+          "position": 104
+        }
+      },
+      "format": "typescript",
+      "fragment": "function isValidEmail(email: string): boolean {\n  if (!email) return false;\n  if (email.length > 254) return false;\n  const at = email.indexOf(\"@\");\n  if (at < 1) return false;\n  const domain = email.slice(at + 1);\n  if (!domain.includes(\".\")) return false;\n  if (domain.startsWith(\".\") || domain.endsWith(\".\")) return false;\n  return true;\n}\n\nexport function cancelOrder(order: Order, requesterEmail: string): Order {",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 12,
+      "secondFile": {
+        "end": 30,
+        "endLoc": {
+          "column": 15,
+          "line": 30,
+          "position": 943
+        },
+        "name": "orders\\app\\place-order.ts",
+        "start": 17,
+        "startLoc": {
+          "column": 0,
+          "line": 17,
+          "position": 446
+        }
+      },
+      "tokens": 98
+    },
+    {
+      "firstFile": {
+        "end": 30,
+        "endLoc": {
+          "column": 15,
+          "line": 30,
+          "position": 943
+        },
+        "name": "orders\\app\\place-order.ts",
+        "start": 13,
+        "startLoc": {
+          "column": 19,
+          "line": 13,
+          "position": 357
+        }
+      },
+      "format": "typescript",
+      "fragment": "  express?: boolean;\n}\n\n// DEFECT D4 (copy 1 of 3): hand-rolled email validation duplicated across modules.\nfunction isValidEmail(email: string): boolean {\n  if (!email) return false;\n  if (email.length > 254) return false;\n  const at = email.indexOf(\"@\");\n  if (at < 1) return false;\n  const domain = email.slice(at + 1);\n  if (!domain.includes(\".\")) return false;\n  if (domain.startsWith(\".\") || domain.endsWith(\".\")) return false;\n  return true;\n}\n\n// DEFECT D9: one function with many branches and no tests (D15).\n// DEFECT D14: money held as floating-point dollars, not integer cents.\nexport function placeOrder(input: PlaceOrderInput): Order {",
+      "isNew": false,
+      "kind": "exact",
+      "lines": 18,
+      "secondFile": {
+        "end": 24,
+        "endLoc": {
+          "column": 15,
+          "line": 24,
+          "position": 699
+        },
+        "name": "users\\app\\register.ts",
+        "start": 9,
+        "startLoc": {
+          "column": 20,
+          "line": 9,
+          "position": 278
+        }
+      },
+      "tokens": 100
+    }
+  ],
+  "statistics": {
+    "detectionDate": "2026-11-22T16:58:22.840Z",
+    "formats": {
+      "typescript": {
+        "clones": 2,
+        "duplicatedLines": 30,
+        "duplicatedTokens": 198,
+        "lines": 212,
+        "newClones": 0,
+        "newDuplicatedLines": 0,
+        "percentage": 14.150943396226415,
+        "percentageTokens": 13.580246913580247,
+        "sources": 11,
+        "tokens": 1458
+      }
+    },
+    "total": {
+      "clones": 2,
+      "duplicatedLines": 30,
+      "duplicatedTokens": 198,
+      "lines": 212,
+      "newClones": 0,
+      "newDuplicatedLines": 0,
+      "percentage": 14.150943396226415,
+      "percentageTokens": 13.580246913580247,
+      "sources": 11,
+      "tokens": 1458
+    }
+  }
+}
