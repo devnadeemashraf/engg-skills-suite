@@ -8,7 +8,7 @@ groups:
   constitution:
     files:
       - references/engineering-constitution.md
-    skills: [engg-architect, engg-audit, engg-build, engg-deep-audit, engg-extend, engg-plan, engg-refactor, engg-roadmap]
+    skills: [engg-architect, engg-audit, engg-build, engg-deep-audit, engg-extend, engg-plan, engg-refactor, engg-roadmap, engg-ship]
 
   toolchain:
     files:
@@ -38,4 +38,4 @@ groups:
   ratchet:
     files:
       - scripts/ratchet.py
-    skills: [engg-audit, engg-deep-audit, engg-refactor]
+    skills: [engg-audit, engg-deep-audit, engg-refactor, engg-ship]
