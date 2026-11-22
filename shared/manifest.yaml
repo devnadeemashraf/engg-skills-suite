@@ -8,7 +8,7 @@ groups:
   constitution:
     files:
       - references/engineering-constitution.md
-    skills: [engg-architect, engg-audit, engg-build, engg-deep-audit, engg-extend, engg-plan, engg-refactor, engg-roadmap, engg-ship]
+    skills: [engg-architect, engg-audit, engg-build, engg-data, engg-deep-audit, engg-extend, engg-plan, engg-refactor, engg-roadmap, engg-ship]
 
   toolchain:
     files:
