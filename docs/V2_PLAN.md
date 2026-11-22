@@ -507,6 +507,17 @@ A run script records results per model. The release gate for 2.0.0 is: recall â‰
 - Neither mode relaxes security, the contract and ratchet, tests at tier, or the Evidence Protocol.
 - `tests/test_triggers.py` checks that every planning and building skill references the file and that its example stays valid; proven to fail when a rule is removed.
 
+### Phase 6: release preparation (2026-11-23)
+
+- **Gaps from the first real-project audit, closed:**
+  - `compile_contract.py` gained `targets.typescript.parser` (TypeScript 7.0 needs `swc`), with a real-tool test.
+  - Deep-audit hotspots rank production code apart from tests.
+  - `ledger.py skip --reason` records deliberate skips, and the report says PARTIAL instead of hiding them.
+- **Codex** is now linked by both installers, so the manual step in the setup guide is gone.
+- **Release material:** `CHANGELOG.md` (2.0.0 notes and v1 migration), the README rewrite and `docs/SETUP.md`; the repository description and topics are updated.
+- **Dogfood:** the deep audit ran on a real project (read-only, 26 production units, 12 findings, honestly marked partial). It found the three gaps above.
+- **Still open:** a fair recall measurement with a fresh agent that hasn't seen the fixtures, and Python and Go eval fixtures.
+
 ## 12. Decisions needed from you
 
 1. **Names:** `engg-deep-audit` and `engg-refactor`? (Alternatives: `engg-xray`, `engg-conform`, `engg-restructure`.)
