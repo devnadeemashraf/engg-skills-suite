@@ -64,15 +64,37 @@ flowchart LR
 | 2   | **[`engg-roadmap`](skills/engg-roadmap/SKILL.md)**     | Roadmap         | Reality-checks an existing roadmap against actual code, grills scope with a 50% Timeline Razor, re-sequences risk-first, and routes every milestone to the right execution skill. | Tightening an in-progress product roadmap, cutting bloat, or accelerating a stalled repo.      |
 | 3   | **[`engg-architect`](skills/engg-architect/SKILL.md)** | Architecture    | Runs a 3–5 round Staff-level Grill Session with zero hand-waving and locks a decision-complete **Engineering Design Doc (EDD)** + ADRs.                                           | Greenfield systems, golden templates, or major new subsystems before writing code.             |
 | 4   | **[`engg-plan`](skills/engg-plan/SKILL.md)**           | Planning        | Breaks any EDD, hardened roadmap milestone, or audit backlog into MVP-first progressive Waves and thin vertical **Atomic Chunks** (1–5 files each).                               | Turning an approved design or next milestone into an executable build queue.                   |
-| 5   | **[`engg-build`](skills/engg-build/SKILL.md)**         | Build & TDD     | Implements one chunk at a time via strict **Red → Green → Refactor** with a mandatory **5-category Test Matrix** (Happy, Fuzz, Concurrency, Fault, Security).                     | Building core functionality without letting test-after drift creep in.                         |
+| 5   | **[`engg-build`](skills/engg-build/SKILL.md)** | Build & TDD | Implements one chunk at a time via strict **Red → Green → Refactor**, with test depth set by **risk tier** (T1 boundaries … T3 all five categories plus mutation testing) and the architecture contract part of green. | Building new behaviour or fixing a defect, test-first. |
 | 6   | **[`engg-extend`](skills/engg-extend/SKILL.md)**       | Evolution       | **Mode A:** Adds a vertical feature slice matching repo conventions. **Mode B:** Adds/swaps an adapter behind a port with **shared LSP contract tests**.                          | Growing an existing repo cleanly or swapping DBs, caches, queues, SDKs, or UI/engine backends. |
 | 7   | **[`engg-audit`](skills/engg-audit/SKILL.md)**         | Review & Harden | **Mode A:** Mandatory post-chunk/PR audit. **Mode C:** Audits & tightens specs/plans written by another LLM. (Whole codebases: `engg-deep-audit`.)                                 | Before every commit or merge, or validating another model's plan.                              |
 | 8   | **[`engg-deep-audit`](skills/engg-deep-audit/SKILL.md)** | Codebase Audit | Maps the whole repo with open-source tools, then reviews it **layer by layer, unit by unit** against the architecture contract, with progress on disk. Emits a strip list, move list, and remediation waves. | Onboarding onto a messy repo, measuring drift from the architecture, or planning a cleanup. |
 | 9   | **[`engg-refactor`](skills/engg-refactor/SKILL.md)**   | Cleanup         | Executes cleanup waves safely: characterization tests first, two-signal deletion re-checked at HEAD, moves/splits/merges toward the contract, and a **ratchet** so violations only go down. | Stripping dead code and reorganising a messy repo layer by layer, one reversible commit at a time. |
-| 10  | **[`engg-research`](skills/engg-research/SKILL.md)**   | Verification    | Enforces zero-memory-guessing live doc/CVE lookup and strict exact dependency, lockfile, and container digest pinning.                                                            | Picking libraries, upgrading major versions, or checking current API signatures.               |
+| 10  | **[`engg-research`](skills/engg-research/SKILL.md)** | Verification | Live lookups only: docs via only-cli (`oc`), versions and peer ranges via registry CLIs, OSV advisories, repo health, live-resolved action SHAs and image digests, in a **dated research brief**. | Picking libraries, upgrading major versions, or checking current API signatures. |
 | 11  | **[`engg-debug`](skills/engg-debug/SKILL.md)**         | Diagnostics     | Scientific debugging & profiling loop (Reproduce → Measure → Hypothesize → Isolate → Root-Cause Fix → Regression Test).                                                           | Hunting races, memory leaks, p99 spikes, Web Vitals jank, mobile ANRs, or game frame drops.    |
 | 12  | **[`engg-data`](skills/engg-data/SKILL.md)**           | Persistence     | Schema modeling, index design, `EXPLAIN ANALYZE` verification, throttled backfills, and **zero-downtime expand-and-contract migrations**.                                         | Touching databases, writing migrations, or eliminating slow queries and lock hazards.          |
-| 13  | **[`engg-ship`](skills/engg-ship/SKILL.md)**           | Release & Ops   | Hardened CI quality gates, non-root immutable containers, declarative IaC, observability/SLOs, Production Readiness Review, rollbacks, and atomic commits.                        | Setting up CI/CD, containerizing, deploying safely, or writing rollback runbooks.              |
+| 13  | **[`engg-ship`](skills/engg-ship/SKILL.md)** | Release & Ops | Machine-enforced CI gates (contract + ratchet), **SHA-pinned supply chain** with actionlint/zizmor and SLSA provenance, merge queues, feature-flagged progressive rollouts, tested rollbacks, and **all five DORA metrics**. | Setting up CI/CD, containerizing, releasing safely, or writing rollback runbooks. |
+
+---
+
+## Which Skill When
+
+Each request has exactly one skill. When two seem to fit, the right column decides. (`tests/test_triggers.py` keeps this table and the skills' descriptions in step.)
+
+| You want to… | Skill | Not this one, because… |
+|---|---|---|
+| Turn a vague idea into a charter | `engg-ideate` | `engg-architect` needs a charter first |
+| Harden an existing roadmap against the real code | `engg-roadmap` | `engg-plan` chunks one milestone, it doesn't judge the roadmap |
+| Design a system and lock its architecture contract | `engg-architect` | `engg-plan` needs a locked design |
+| Break a design, milestone or audit report into chunks | `engg-plan` | `engg-build` executes one chunk, it doesn't plan |
+| Build new behaviour test-first, or fix a defect test-first | `engg-build` | `engg-refactor` must not change behaviour |
+| Add a feature slice or an adapter to an existing architecture | `engg-extend` | `engg-build` is for chunks with no existing slice to follow |
+| Review a diff, a pull request, or a spec | `engg-audit` | `engg-deep-audit` is for whole codebases |
+| Audit a whole codebase or subsystem against its contract | `engg-deep-audit` | `engg-audit` only sees a diff |
+| Clean up or restructure without changing behaviour | `engg-refactor` | `engg-build` adds behaviour |
+| Find a bug's or slowdown's root cause | `engg-debug` | `engg-build` assumes the cause is known |
+| Design a schema, migration, query, or backfill | `engg-data` | `engg-build` doesn't cover lock safety or backfills |
+| Set up CI/CD, release, infrastructure, rollouts | `engg-ship` | `engg-build` stops at a verified chunk |
+| Pick or upgrade a library, check versions or APIs | `engg-research` | every other skill delegates version facts here |
 
 ---
 
