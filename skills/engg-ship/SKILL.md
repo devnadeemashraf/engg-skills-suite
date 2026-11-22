@@ -34,7 +34,7 @@ Ship software reliably, repeatably, and reversibly, with gates that machines enf
 
 ## Workflow
 
-1. **Local and pre-commit (seconds):** formatter, linter, typecheck, secret scan (`gitleaks git --pre-commit --redact`), via lefthook or pre-commit. The same commands run again in CI; hooks are a convenience, not the gate.
+1. **Local and pre-commit (seconds):** formatter, linter, typecheck, secret scan of what is about to be committed (`gitleaks git --pre-commit --staged --redact`), via lefthook or pre-commit. The same commands run again in CI; hooks are a convenience, not the gate.
 2. **CI quality gates (fail fast):**
    - **Stage 1, seconds:** secret scan, format check, lint, typecheck, `actionlint` + `zizmor` on workflow changes.
    - **Stage 2, fast:** unit and contract tests, the compiled architecture enforcer, the ratchet check, IaC validate and lint (`checkov` / `tflint`), Dockerfile lint (`hadolint`).
