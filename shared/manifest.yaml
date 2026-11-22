@@ -8,7 +8,7 @@ groups:
   constitution:
     files:
       - references/engineering-constitution.md
-    skills: [engg-architect, engg-audit, engg-build, engg-deep-audit, engg-extend, engg-roadmap]
+    skills: [engg-architect, engg-audit, engg-build, engg-deep-audit, engg-extend, engg-refactor, engg-roadmap]
 
   toolchain:
     files:
@@ -24,6 +24,7 @@ groups:
       - engg-deep-audit
       - engg-debug
       - engg-extend
+      - engg-refactor
       - engg-research
       - engg-roadmap
       - engg-ship
@@ -32,4 +33,9 @@ groups:
     files:
       - references/architecture-contract.md
       - scripts/compile_contract.py
-    skills: [engg-architect, engg-audit, engg-deep-audit, engg-extend]
+    skills: [engg-architect, engg-audit, engg-deep-audit, engg-extend, engg-refactor]
+
+  ratchet:
+    files:
+      - scripts/ratchet.py
+    skills: [engg-deep-audit, engg-refactor]
