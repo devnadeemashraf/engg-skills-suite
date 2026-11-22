@@ -19,7 +19,7 @@ The biggest change from v1: **v1 describes standards in prose and trusts the mod
 | **Merge queue → canary → automatic deploy** | Shopify: PR → CI → merge queue (CI runs on queued PRs, merged in batches) → automatic deploy to a canary taking a random 5% of traffic → production. Nobody presses "deploy". | [Shopify: release culture](https://shopify.engineering/software-release-culture-shopify), [merge queue](https://shopify.engineering/introducing-the-merge-queue), [automatic deployment](https://shopify.engineering/blogs/engineering/automatic-deployment-at-shopify) |
 | **Feature flags plus fast rollback** | Deploying and releasing are separate steps. Flags let a change be turned off without a redeploy. | [GitHub: feature flags](https://github.blog/engineering/ship-code-faster-safer-feature-flags), [Stripe change management](https://stripe.com/careers/listing/staff-engineer-release-engineering/8038771) |
 | **Measure delivery** | DORA: lead time, deploy frequency, change failure rate, time to restore. The 2025 report says AI raises output per author but adds review load, so small reviewable changes matter more now. | [DORA 2025](https://cloud.google.com/resources/devops/state-of-devops), [DORA: AI tensions](https://dora.dev/insights/balancing-ai-tensions/) |
-| **Architecture is enforced by tests** | Layer and dependency rules run as tests or CI gates: ArchUnit (JVM), dependency-cruiser (JS/TS), import-linter (Python), and archfit (cross-language, built for AI agents and CI). | [ArchUnit](https://archunit.org/), [archfit](https://pkg.go.dev/github.com/alexei-led/archfit) |
+| **Architecture is enforced by tests** | Layer and dependency rules run as tests or CI gates: ArchUnit (JVM), dependency-cruiser (JS/TS), import-linter (Python), go-arch-lint (Go), and the young archfit (cross-language, built for AI agents; see the Phase 1 note in §11). | [ArchUnit](https://archunit.org/), [archfit](https://github.com/coupling-dev/archfit) |
 | **Supply-chain hygiene** | SLSA provenance, Sigstore signing, OpenSSF Scorecard, OSV for known vulnerabilities, and third-party CI actions pinned to a commit SHA. | [Scorecard](https://github.com/ossf/scorecard), [SLSA/OpenSSF](https://openssf.org/tag/slsa) |
 | **Why pinning to a SHA matters (2026)** | In March 2026, attackers force-pushed malicious commits onto 76 of 77 `aquasecurity/trivy-action` version tags (CVE-2026-33634). Only workflows pinned to a SHA, plus the one immutable release, were safe. | [Aqua](https://www.aquasec.com/blog/trivy-supply-chain-attack/), [GHSA-69fq-xp46-6x23](https://github.com/aquasecurity/trivy/security/advisories/GHSA-69fq-xp46-6x23) |
 | **Security baseline** | OWASP ASVS 5.0.0 (May 2025): three cumulative levels, requirements cited as `v5.0.0-<ch>.<sec>.<req>`. | [OWASP ASVS](https://owasp.org/ASVS/) |
@@ -100,8 +100,8 @@ The suite **compiles** this contract into the target ecosystem's native enforcer
 | JS/TS | `.dependency-cruiser.cjs` (+ `knip.json`) |
 | Python | `.importlinter` contracts |
 | JVM / .NET | ArchUnit / ArchUnitNET test class |
-| Go | `archfit` (or `go-arch-lint`) config |
-| Any / multi-language | `archfit` `.archfit.yaml` (which uses dependency-cruiser, import-linter and others underneath) |
+| Go | `go-arch-lint` config |
+| Multi-language (optional, experimental) | `archfit` `.archfit.yaml`, only alongside the native enforcers above, never as the only gate |
 
 The compiler is a script in `shared/scripts/compile_contract.py`: deterministic and unit-tested. The model never hand-writes these configs.
 
@@ -170,7 +170,7 @@ Each skill that benefits from a tool follows this protocol (`shared/references/t
 | **Code knowledge graph** | `graphify` (code-only and offline by default): `graphify update .`, `query`, `path`, `explain`, `graphify-mcp`; output `graphify-out/graph.json`, `GRAPH_REPORT.md` | — | deep-audit, audit, refactor, extend, roadmap |
 | **Fast search / structural search** | `ripgrep`, `ast-grep` | — | all |
 | **Repo inventory / size** | `scc` (LOC, languages, complexity estimate) | — | deep-audit, roadmap |
-| **Architecture conformance** | `archfit` | dependency-cruiser · import-linter / grimp · ArchUnit · `go list`-based | architect, deep-audit, audit, ship |
+| **Architecture conformance** | Native per ecosystem (right) · `archfit` optional/experimental | dependency-cruiser · import-linter / grimp · ArchUnit · go-arch-lint | architect, deep-audit, audit, ship |
 | **Complexity** | `lizard` (many languages) | ESLint complexity · radon · gocyclo | deep-audit, refactor |
 | **Duplication** | `jscpd` | — | deep-audit, refactor |
 | **Dead code / unused dependencies** | — | knip · vulture · `deadcode` (Go) · cargo-udeps / cargo-machete | deep-audit, refactor |
@@ -187,7 +187,7 @@ Each skill that benefits from a tool follows this protocol (`shared/references/t
 | **Dependency updates** | Renovate (self-hosted CLI or app) | — | ship |
 | **Load / web performance / accessibility** | `k6`, Lighthouse CI, `axe-core` CLI | — | ship, build |
 
-Tool facts above come from project READMEs and listings (graphify, oc, archfit, Opengrep) or well-established tools. Each entry gets re-verified with `engg-research` when the registry file is written in Phase 1.
+Tool facts above come from project READMEs and listings (graphify, oc, archfit, Opengrep) or well-established tools. Phase 1 re-verified every entry against its repository; the result is `shared/references/toolchain.md`, which supersedes this table where they differ.
 
 ---
 
@@ -211,7 +211,7 @@ Tool facts above come from project READMEs and listings (graphify, oc, archfit, 
 All of these write to `raw/`:
 - `scc --format json`
 - `graphify update .` (code-only)
-- native dependency graph + `archfit analyze` (or dependency-cruiser / import-linter)
+- native dependency graph and architecture report (dependency-cruiser / import-linter / ArchUnit / go-arch-lint; `archfit analyze` as an optional extra)
 - `lizard` (complexity)
 - `jscpd` (duplication)
 - dead-code tool for the stack
@@ -233,7 +233,7 @@ All of these write to `raw/`:
 **Phase 2: Contract gate**
 - If `.engg/architecture.yaml` is missing, **stop**. Offer to draft an as-is contract from graphify communities and the directory layout, then hand off to `engg-architect` (brownfield mode) to ratify the to-be contract.
 - **An audit without an agreed architecture isn't run.**
-- Otherwise, run `archfit check` (or the native enforcer) and record every layer violation, cycle and forbidden import as `ARCH-*` findings.
+- Otherwise, run the native enforcer compiled from the contract and record every layer violation, cycle and forbidden import as `ARCH-*` findings.
 
 **Phase 3: Plan the traversal**
 - Split the repo into **units**: a module × layer slice of about 300–800 LOC, split further if larger.
@@ -439,13 +439,20 @@ A run script records results per model. The release gate for 2.0.0 is: recall �
 |---|---|---|
 | **0. Hygiene** | README fixes, installer parity, validator upgrades (YAML parsing, CRLF), CI pinned by SHA + actionlint/zizmor, pytest/shellcheck | CI green on 3 operating systems; validator catches a seeded CRLF/multi-line case |
 | **1. Shared core** | `shared/` + `sync_shared.py` + manifest; new constitution sections (Evidence, Tiers, Ratchet, Simplicity); `toolchain.md` (verified live) + `tool-consent.md`; `toolcheck.sh/.ps1` | Sync check in CI; toolcheck runs on Windows, macOS and Linux |
-| **2. Architecture Contract** | Schema + docs; `compile_contract.py` → dependency-cruiser, import-linter, archfit (ArchUnit later); unit tests; architect writes the contract | Compiled configs flag the seeded layer violation in the ts and py fixtures |
+| **2. Architecture Contract** | Schema + docs; `compile_contract.py` → dependency-cruiser, import-linter, go-arch-lint (ArchUnit later; archfit optional); unit tests; architect writes the contract | Compiled configs flag the seeded layer violation in the ts and py fixtures |
 | **3. engg-deep-audit** | Skill + `build_map.py` + `ledger.py` + checklists; eval fixtures | Meets the §10 release-gate metrics on the fixtures |
 | **4. engg-refactor** | Skill + characterization-test guidance + ratchet script | Executes Waves 1–2 on `ts-messy-api` with tests green and the baseline shrinking |
 | **5. Upgrade the 11 existing skills** | Per §7, one skill per commit; audit narrowed; tiers wired through plan/build/audit/ship | Validator + evals green; trigger table has no overlaps |
 | **6. Release 2.0.0** | CHANGELOG, migration notes from v1 (Mode B → deep-audit), signed tag | Dogfood: run deep-audit on one of your real projects and review the report together |
 
 ---
+
+### Phase 1 findings (2026-11-22)
+
+- **archfit is not ready to be the default.** The original repository was archived on 2026-11-20 and moved to `coupling-dev/archfit` (v0.9.0, 0 stars, 3 contributors at the time of checking). Native, mature enforcers per ecosystem are the default for the Architecture Contract; archfit stays optional and experimental.
+- **Licences checked.** TruffleHog, Renovate and k6 are AGPL-3.0, and hadolint is GPL-3.0. That's fine for running them as CLIs; the registry notes it.
+- **only-cli 0.5.8 has no `--version` flag** (the 0.5.10 README lists one). `toolcheck` identifies `oc` by its `--help` text instead, which also catches OpenShift's `oc`.
+- **Simplification:** the Evidence Protocol, Risk Tiers and Ratchet live as sections of the shared constitution, not as separate files. The architecture contract reference arrives in Phase 2.
 
 ## 12. Decisions needed from you
 
