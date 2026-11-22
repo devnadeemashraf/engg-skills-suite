@@ -38,7 +38,10 @@ jobs:
       - name: Validate skills against the spec and suite rules
         run: python tools/validate_suite.py
       - name: Run tests (fail if any real-enforcer test is skipped)
+        # Without an explicit shell, steps run as `bash -e` with no pipefail, so `| tee` would hide a pytest failure.
+        shell: bash
         run: |
+          set -o pipefail
           python -m pytest -q -rs | tee pytest.log
           if grep -q "SKIPPED" pytest.log; then echo "::error::tests were skipped; CI must run every enforcer"; exit 1; fi
 
