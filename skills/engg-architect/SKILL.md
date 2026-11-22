@@ -25,6 +25,7 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
 3. **Stay genuinely tech-agnostic until locked:** Never silently assume a language, framework, engine, database, or cloud provider. Ask or propose one concrete, justified recommendation and get sign-off.
 4. **Verify live versions when selecting a stack:** If concrete libraries/frameworks/runtimes are chosen, invoke `engg-research` (or verify against current docs) rather than guessing versions from memory.
 5. **Enforce design invariants:** Every EDD must explicitly codify SOLID, DRY, KISS, ATOMIC boundaries, Hexagonal/Clean dependency flow, explicit contracts, security controls, and hard resource/performance budgets.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 

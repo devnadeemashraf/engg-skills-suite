@@ -24,6 +24,7 @@ Implement one planned chunk at a time using disciplined **Red -> Green -> Refact
 3. **One chunk at a time:** Finish implementing, verifying, and auditing (`engg-audit`) the current chunk before starting the next—unless the user explicitly requests batching.
 4. **Zero memory-guessing on libraries:** If adding or upgrading any dependency or calling an unfamiliar API, run `engg-research` first to verify live docs and exact pinned versions.
 5. **No shortcuts:** Never swallow errors, bypass type safety (`any`/`unsafe` without documented proof), omit timeouts/bounds, hardcode secrets, or weaken a failing test to make it pass.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 

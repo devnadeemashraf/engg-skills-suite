@@ -25,6 +25,7 @@ Eliminate hallucinated APIs, stale package versions, deprecated flags, and suppl
 3. **Primary sources only:** Prefer official docs, release changelogs, RFCs, and package registries over random blog posts or stale Q&A threads.
 4. **Pin exact, auditable versions:** No floating ranges (`latest`, `*`, unpinned `^`/`~` in critical manifests/Dockerfiles) without an explicit lockfile and digest policy.
 5. **Justify every dependency:** Adding a dependency is taking on permanent security and maintenance liability. Reject bloated libraries when 20 lines of clean standard-library code suffice (KISS).
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 

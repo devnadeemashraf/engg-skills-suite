@@ -24,6 +24,7 @@ Grow an in-progress codebase rapidly without architectural drift by enforcing st
 3. **Never leak adapter details into core:** Domain code must never import SDK types, ORM models, HTTP frameworks, or vendor error codes. Map all external errors and DTOs at the adapter boundary.
 4. **Shared Contract Tests are mandatory for adapters:** Every port interface must have a reusable contract test suite that runs identically against fakes/in-memory implementations and every real adapter (proving Liskov Substitution).
 5. **Strict TDD + Post-Audit:** Follow `engg-build` test-first discipline and finish with `engg-audit` (Mode A).
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow — Mode A: Vertical Feature Module
 

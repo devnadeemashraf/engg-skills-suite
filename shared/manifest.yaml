@@ -9,3 +9,20 @@ groups:
     files:
       - references/engineering-constitution.md
     skills: [engg-architect, engg-audit, engg-build, engg-extend, engg-roadmap]
+
+  toolchain:
+    files:
+      - references/toolchain.md
+      - references/tool-consent.md
+      - scripts/toolcheck.sh
+      - scripts/toolcheck.ps1
+    skills:
+      - engg-architect
+      - engg-audit
+      - engg-build
+      - engg-data
+      - engg-debug
+      - engg-extend
+      - engg-research
+      - engg-roadmap
+      - engg-ship

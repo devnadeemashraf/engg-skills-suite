@@ -24,6 +24,7 @@ Solve complex defects and performance bottlenecks systematically using the scien
 3. **Measure before AND after:** Every performance optimization must report exact baseline metrics vs. post-fix metrics under identical conditions.
 4. **Fix the root cause, not the symptom:** Adding `sleep()`, swallowing an exception, or slapping a cache over a broken O(N^2) query is prohibited.
 5. **Lock every fix with a regression test:** Every bug fix must add an automated test that fails before the fix and passes after.
+6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 
 ## Workflow
 
