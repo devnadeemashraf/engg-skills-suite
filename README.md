@@ -199,6 +199,20 @@ _Options: `-Copy`, `-DryRun`, `-Uninstall` (same behaviour as the shell installe
 
 ---
 
+## Architecture as a Machine-Checked Contract
+
+`engg-architect` writes the agreed architecture to `.engg/architecture.yaml` in your repo: layers, which layer may import which, external-package limits, and feature-module isolation. `compile_contract.py` turns it into the native checker for your stack, so the same rules run in the editor, pre-commit, and CI:
+
+| Stack | Checker generated |
+|---|---|
+| TypeScript / JavaScript | dependency-cruiser |
+| Python | import-linter |
+| Go | go-arch-lint |
+
+Every compile prints a **coverage report**. A rule a checker can't express is reported as *not covered*, never silently dropped. The schema is documented in [`shared/references/architecture-contract.md`](shared/references/architecture-contract.md).
+
+---
+
 ## Open-Source Toolchain (Asked, Never Assumed)
 
 Skills lean on free, open-source tools wherever a tool is faster, cheaper in tokens, or more accurate than reading code by hand. Examples: a code knowledge graph (graphify), compact web reading (only-cli), architecture rule checkers, dead-code and duplication finders, secret and vulnerability scanners.
@@ -220,7 +234,7 @@ engg-skills-suite/
 ├── shared/                          # Single source of truth for files several skills use
 │   ├── manifest.yaml                # Which skills receive which shared files
 │   ├── references/                  # Constitution, toolchain registry, tool consent protocol
-│   └── scripts/                     # toolcheck.sh / toolcheck.ps1 (read-only tool detection)
+│   └── scripts/                     # toolcheck.sh/.ps1 (tool detection), compile_contract.py
 ├── skills/
 │   ├── engg-ideate/                  # Idea framing & Project Charter
 │   ├── engg-roadmap/                 # Existing roadmap grilling, reality-check & routing
@@ -238,7 +252,8 @@ engg-skills-suite/
 ├── tools/validate_suite.py          # Agent Skills spec & suite-rule validator
 ├── tools/sync_shared.py             # Copies shared/ into skills; --check fails CI on drift
 ├── tools/pin_requirements.py        # Regenerates the hash-pinned requirements files
-├── tests/                           # Validator, sync & toolcheck tests + installer smoke tests
+├── tests/                           # Validator, sync, toolcheck & contract tests; fixture repos
+├── package.json                     # Dev-only Node tooling for contract tests (exact pins + lockfile)
 ├── CONTRIBUTING.md                  # Authoring standards for extending the suite
 └── LICENSE                          # Apache-2.0
 ```
@@ -252,6 +267,7 @@ Before pushing changes, run the validator and tests. The validator checks `agent
 ```bash
 python -m venv .venv && . .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install --require-hashes -r requirements-dev.txt
+npm ci --ignore-scripts                               # Node 22+: dependency-cruiser for contract tests
 python tools/sync_shared.py --check
 python tools/validate_suite.py
 python -m pytest -q

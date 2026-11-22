@@ -454,6 +454,15 @@ A run script records results per model. The release gate for 2.0.0 is: recall â‰
 - **only-cli 0.5.8 has no `--version` flag** (the 0.5.10 README lists one). `toolcheck` identifies `oc` by its `--help` text instead, which also catches OpenShift's `oc`.
 - **Simplification:** the Evidence Protocol, Risk Tiers and Ratchet live as sections of the shared constitution, not as separate files. The architecture contract reference arrives in Phase 2.
 
+### Phase 2 findings (2026-11-22)
+
+- **dependency-cruiser rejects regexes with nested quantifiers** (its safe-regex check), and then refuses to run at all. The obvious glob translations (`(?:[^/]+/)*`, `(?:/.*)?`) trip it. The compiler now emits only unnested forms, and a test enforces this.
+- **dependency-cruiser 18.8.0 excludes TypeScript 7.0.x** (supported: `<7.0.0 || >=7.1.0`), so TypeScript is pinned to 6.0.3. Revisit when 7.1 ships.
+- **import-linter checks indirect imports by default.** The compiler sets `allow_indirect_imports = True`, so every target enforces the same thing: direct imports between layers.
+- **Coverage gaps are reported, not hidden.** import-linter can't express external allowlists, public-entry exceptions, or cycles; go-arch-lint has no module isolation. The compiler's coverage report marks these NOT COVERED. The deep audit (Phase 3) checks them from the code graph instead.
+- **Generated configs go to `.engg/generated/`**, so they never overwrite a project's own `.dependency-cruiser.*` or `.importlinter`.
+- go-arch-lint output is verified structurally only; running the real binary in CI is a follow-up.
+
 ## 12. Decisions needed from you
 
 1. **Names:** `engg-deep-audit` and `engg-refactor`? (Alternatives: `engg-xray`, `engg-conform`, `engg-restructure`.)

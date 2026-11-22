@@ -34,13 +34,14 @@ Every skill in this repository is held to the same engineering standard it enfor
 ```bash
 python -m venv .venv && . .venv/bin/activate          # Windows: .venv\Scripts\activate
 python -m pip install --require-hashes -r requirements-dev.txt
+npm ci --ignore-scripts                               # Node 22+: dependency-cruiser for contract tests
 python tools/sync_shared.py --check
 python tools/validate_suite.py
 python -m pytest -q
 bash tests/installer_smoke.sh                         # Windows: .\tests\installer_smoke.ps1
 ```
 
-All checks must pass with zero errors. CI also runs shellcheck, actionlint, zizmor, and PSScriptAnalyzer.
+All checks must pass with zero errors, and no test may be skipped in CI: the real-enforcer tests need the Python and Node dev dependencies above. CI also runs shellcheck, actionlint, zizmor, and PSScriptAnalyzer.
 
 ## Dependencies and Pinning
 
