@@ -19,10 +19,11 @@ Usage:
 
 Scopes:
   --global            Canonical copy in ~/.engg-skills-suite/skills/, linked into:
-                        ~/.claude/skills/            (Claude Code)
+                        ~/.claude/skills/            (Claude Code; Cursor and Copilot read it too)
+                        ~/.codex/skills/             (Codex)
                         ~/.gemini/config/skills/     (Antigravity CLI & IDE)
   --project <path>    Canonical copy in <repo>/.agents/skills/ (open standard: Antigravity,
-                      Codex, Cursor, Copilot, OpenCode), linked into <repo>/.claude/skills/.
+                      Cursor, Copilot), linked into <repo>/.claude/skills/ and <repo>/.codex/skills/.
 
 Options:
   --copy        Copy files instead of creating symlinks
@@ -84,12 +85,12 @@ done
 
 if [[ "$MODE" == "global" ]]; then
   CANONICAL_DIR="${HOME}/.engg-skills-suite/skills"
-  TOOL_DIRS=("${HOME}/.claude/skills" "${HOME}/.gemini/config/skills")
+  TOOL_DIRS=("${HOME}/.claude/skills" "${HOME}/.codex/skills" "${HOME}/.gemini/config/skills")
 else
   [[ -d "$PROJECT_DIR" ]] || die "project directory does not exist: $PROJECT_DIR"
   PROJECT_ABS="$(cd "$PROJECT_DIR" && pwd)"
   CANONICAL_DIR="${PROJECT_ABS}/.agents/skills"
-  TOOL_DIRS=("${PROJECT_ABS}/.claude/skills")
+  TOOL_DIRS=("${PROJECT_ABS}/.claude/skills" "${PROJECT_ABS}/.codex/skills")
 fi
 
 if [[ "$UNINSTALL" -eq 1 ]]; then
@@ -108,7 +109,7 @@ for skill in "${SKILLS[@]}"; do
   run cp -R "${SRC_SKILLS_DIR}/${skill}" "${CANONICAL_DIR}/${skill}"
   for dir in "${TOOL_DIRS[@]}"; do
     if [[ "$MODE" == "project" ]]; then
-      # <repo>/.claude/skills/<name> -> ../../.agents/skills/<name> (survives moving the repo)
+      # <repo>/.claude/skills/<name> and <repo>/.codex/skills/<name> -> ../../.agents/skills/<name> (survives moving the repo)
       place "${CANONICAL_DIR}/${skill}" "${dir}/${skill}" "../../.agents/skills/${skill}"
     else
       place "${CANONICAL_DIR}/${skill}" "${dir}/${skill}"
