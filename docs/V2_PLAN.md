@@ -483,6 +483,23 @@ A run script records results per model. The release gate for 2.0.0 is: recall â‰
 - **Cleanups need type-check and lint gates:** an unused import left by a deletion went uncaught until checked by hand.
 - **Ratchet secrets against the working tree, audit them against history:** history keeps a secret until it is rotated.
 
+### Phase 5 findings (2026-11-22)
+
+- **All 11 original skills upgraded to 2.0.0, one commit each**, plus the trigger table. `tests/test_triggers.py` checks that every skill appears in the README's "Which Skill When" table exactly once, and that confusable pairs (audit/deep-audit, build/refactor/extend) name each other in their descriptions. Proven to fail when a row or a cross-reference is removed.
+- **Facts checked live before writing them into skills:**
+  - DORA has **five** metrics (deployment rework rate since 2024).
+  - SLSA **v1.2** is current.
+  - `actions/attest` supersedes `attest-build-provenance`; private repos need Enterprise Cloud.
+  - Renovate's preset is `helpers:pinGitHubActionDigests`.
+  - MADR **4.0.0**.
+  - OpenFeature is still CNCF **incubating** (one vendor blog's "graduated" claim isn't backed by CNCF).
+- **Corrections made during the phase:**
+  - gitleaks pre-commit needs `--staged`.
+  - Annotated tags resolve to their commit via the `^{}` line.
+  - A YAML apostrophe was lost to Python string concatenation.
+  - engg-data's risk-tier reference was briefly broken, because a validator failure was swallowed by `| head`; folded into one green commit.
+- Running `npx --yes squawk-cli` to check flags was refused by the harness: it would have installed a package without consent. squawk's usage was taken from its README instead, which is the right call under the tool consent protocol.
+
 ## 12. Decisions needed from you
 
 1. **Names:** `engg-deep-audit` and `engg-refactor`? (Alternatives: `engg-xray`, `engg-conform`, `engg-restructure`.)
