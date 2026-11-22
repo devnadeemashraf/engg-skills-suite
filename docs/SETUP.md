@@ -35,8 +35,8 @@ What the installer creates:
 
 | Scope | Master copy | Linked into |
 |---|---|---|
-| Global | `~/.engg-skills-suite/skills/` | `~/.claude/skills/` (Claude Code, and Cursor and Copilot through compatibility) and `~/.gemini/config/skills/` (Antigravity) |
-| Project | `<repo>/.agents/skills/` (the open standard: Antigravity, Cursor, Copilot) | `<repo>/.claude/skills/` (Claude Code, and Cursor and Copilot through compatibility) |
+| Global | `~/.engg-skills-suite/skills/` | `~/.claude/skills/` (Claude Code, and Cursor and Copilot through compatibility), `~/.codex/skills/` (Codex) and `~/.gemini/config/skills/` (Antigravity) |
+| Project | `<repo>/.agents/skills/` (the open standard: Antigravity, Cursor, Copilot) | `<repo>/.claude/skills/` (Claude Code, and Cursor and Copilot through compatibility) and `<repo>/.codex/skills/` (Codex) |
 
 There is one master copy, and the tool folders link to it, so updating the master updates every tool at once. Use `--copy` if your environment doesn't allow links.
 
@@ -100,20 +100,7 @@ Works after either install. Copilot reads project skills from `.github/skills/`,
 
 ### Codex
 
-Codex reads `~/.codex/skills/` (personal) and `<repo>/.codex/skills/` (repository). The installer doesn't link these yet, so after a global install, link them once:
-
-```bash
-mkdir -p ~/.codex/skills
-for skill in ~/.engg-skills-suite/skills/*/; do ln -sfn "${skill%/}" ~/.codex/skills/"$(basename "$skill")"; done
-```
-
-```powershell
-New-Item -ItemType Directory -Force "$HOME\.codex\skills" | Out-Null
-Get-ChildItem "$HOME\.engg-skills-suite\skills" -Directory | ForEach-Object {
-  New-Item -ItemType Junction -Path "$HOME\.codex\skills\$($_.Name)" -Target $_.FullName -Force | Out-Null }
-```
-
-Then run `/skills`, or type `$`, in Codex to pick a skill. Restart Codex after changing `~/.codex/config.toml`.
+Works after either install. Codex reads `~/.codex/skills/` (personal) and `<repo>/.codex/skills/` (repository), and the installer links both. Run `/skills`, or type `$`, in Codex to pick a skill. Restart Codex after changing `~/.codex/config.toml`.
 
 ### A web chat with no file access
 
@@ -173,7 +160,7 @@ The tools that help most, by job (full list with licences: [toolchain registry](
 ## 8. Update, uninstall
 
 - **Update:** `git pull` in your clone, then run the installer again with the same scope. Global installs refresh the master copy, which updates every linked tool. Project installs are refreshed one repository at a time.
-- **Uninstall:** `./install.sh --global --uninstall` (or `--project <path> --uninstall`), or `.\install.ps1 -Scope Global -Uninstall`. It removes only this suite's skills. Codex links, if you made them, are removed with `rm ~/.codex/skills/engg-*`.
+- **Uninstall:** `./install.sh --global --uninstall` (or `--project <path> --uninstall`), or `.\install.ps1 -Scope Global -Uninstall`. It removes only this suite's skills, from every folder the installer filled.
 
 ## 9. Troubleshooting
 

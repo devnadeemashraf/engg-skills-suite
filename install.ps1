@@ -4,9 +4,10 @@
 
 .DESCRIPTION
   Global scope:  canonical copy in ~/.engg-skills-suite/skills, linked into
-                 ~/.claude/skills (Claude Code) and ~/.gemini/config/skills (Antigravity CLI & IDE).
+                 ~/.claude/skills (Claude Code; Cursor and Copilot read it too), ~/.codex/skills (Codex)
+                 and ~/.gemini/config/skills (Antigravity CLI & IDE).
   Project scope: canonical copy in <repo>/.agents/skills (open standard: Antigravity, Codex,
-                 Cursor, Copilot, OpenCode), linked into <repo>/.claude/skills.
+                 Cursor, Copilot), linked into <repo>/.claude/skills and <repo>/.codex/skills.
 
   Links are symbolic links when allowed (Developer Mode or admin), otherwise directory junctions,
   which need no special rights. Use -Copy to copy files instead.
@@ -114,7 +115,7 @@ $IsWindowsHost = ($PSVersionTable.PSEdition -eq "Desktop") -or ((Get-Variable Is
 if ($Scope -eq "Global") {
   if (-not (Test-Path -LiteralPath $HomeDir -PathType Container)) { throw "Home directory does not exist: $HomeDir" }
   $CanonicalDir = Join-Path $HomeDir ".engg-skills-suite/skills"
-  $ToolDirs = @((Join-Path $HomeDir ".claude/skills"), (Join-Path $HomeDir ".gemini/config/skills"))
+  $ToolDirs = @((Join-Path $HomeDir ".claude/skills"), (Join-Path $HomeDir ".codex/skills"), (Join-Path $HomeDir ".gemini/config/skills"))
   $UseRelative = $false
 } else {
   if (-not $ProjectPath) { throw "-ProjectPath is required with -Scope Project." }
@@ -123,7 +124,7 @@ if ($Scope -eq "Global") {
   }
   $ProjectAbs = (Resolve-Path -LiteralPath $ProjectPath).ProviderPath
   $CanonicalDir = Join-Path $ProjectAbs ".agents/skills"
-  $ToolDirs = @(Join-Path $ProjectAbs ".claude/skills")
+  $ToolDirs = @((Join-Path $ProjectAbs ".claude/skills"), (Join-Path $ProjectAbs ".codex/skills"))
   $UseRelative = $true
 }
 

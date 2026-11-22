@@ -58,6 +58,7 @@ pass "argument errors"
 PROJ="${WORK}/proj"; mkdir -p "$PROJ/.claude/skills/someone-elses-skill"
 bash "$INSTALLER" --project "$PROJ" >/dev/null
 assert_installed "$PROJ/.agents/skills" "$PROJ/.claude/skills" "$LINKS"
+assert_installed "$PROJ/.agents/skills" "$PROJ/.codex/skills" "$LINKS"
 if [[ "$LINKS" -eq 1 ]]; then
   target="$(readlink "$PROJ/.claude/skills/${SKILLS[0]}")"
   [[ "$target" == "../../.agents/skills/${SKILLS[0]}" ]] || fail "project link should be relative, got $target"
@@ -69,7 +70,7 @@ assert_installed "$PROJ/.agents/skills" "$PROJ/.claude/skills" "$LINKS"
 pass "project reinstall is idempotent"
 
 bash "$INSTALLER" --project "$PROJ" --uninstall >/dev/null
-assert_removed "$PROJ/.agents/skills" "$PROJ/.claude/skills"
+assert_removed "$PROJ/.agents/skills" "$PROJ/.claude/skills" "$PROJ/.codex/skills"
 [[ -d "$PROJ/.claude/skills/someone-elses-skill" ]] || fail "uninstall removed a skill that is not part of the suite"
 pass "project uninstall leaves other skills alone"
 
@@ -88,11 +89,12 @@ pass "dry run changes nothing"
 FAKE_HOME="${WORK}/home"; mkdir -p "$FAKE_HOME"
 HOME="$FAKE_HOME" bash "$INSTALLER" --global >/dev/null
 assert_installed "$FAKE_HOME/.engg-skills-suite/skills" "$FAKE_HOME/.claude/skills" "$LINKS"
+assert_installed "$FAKE_HOME/.engg-skills-suite/skills" "$FAKE_HOME/.codex/skills" "$LINKS"
 assert_installed "$FAKE_HOME/.engg-skills-suite/skills" "$FAKE_HOME/.gemini/config/skills" "$LINKS"
 pass "global install"
 
 HOME="$FAKE_HOME" bash "$INSTALLER" --global --uninstall >/dev/null
-assert_removed "$FAKE_HOME/.engg-skills-suite/skills" "$FAKE_HOME/.claude/skills" "$FAKE_HOME/.gemini/config/skills"
+assert_removed "$FAKE_HOME/.engg-skills-suite/skills" "$FAKE_HOME/.claude/skills" "$FAKE_HOME/.codex/skills" "$FAKE_HOME/.gemini/config/skills"
 [[ -f "${REPO_ROOT}/skills/${SKILLS[0]}/SKILL.md" ]] || fail "uninstall touched the source skills"
 pass "global uninstall"
 

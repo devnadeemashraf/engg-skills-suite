@@ -58,6 +58,7 @@ try {
   New-Item -ItemType Directory -Force -Path $foreign | Out-Null
   Invoke-Installer @{ Scope = "Project"; ProjectPath = $proj }
   Assert-Installed (Join-Path $proj ".agents/skills") (Join-Path $proj ".claude/skills") $true
+  Assert-Installed (Join-Path $proj ".agents/skills") (Join-Path $proj ".codex/skills") $true
   Write-Host "ok - project install"
 
   # Reinstall replaces the canonical folder and then removes the old link. If link removal followed
@@ -67,7 +68,7 @@ try {
   Write-Host "ok - project reinstall is idempotent and keeps link targets intact"
 
   Invoke-Installer @{ Scope = "Project"; ProjectPath = $proj; Uninstall = $true }
-  Assert-Removed @((Join-Path $proj ".agents/skills"), (Join-Path $proj ".claude/skills"))
+  Assert-Removed @((Join-Path $proj ".agents/skills"), (Join-Path $proj ".claude/skills"), (Join-Path $proj ".codex/skills"))
   Assert-True (Test-Path -LiteralPath $foreign) "uninstall removed a skill that is not part of the suite"
   Write-Host "ok - project uninstall leaves other skills alone"
 
@@ -93,11 +94,12 @@ try {
   Invoke-Installer @{ Scope = "Global"; HomeDir = $fakeHome }
   $canonical = Join-Path $fakeHome ".engg-skills-suite/skills"
   Assert-Installed $canonical (Join-Path $fakeHome ".claude/skills") $true
+  Assert-Installed $canonical (Join-Path $fakeHome ".codex/skills") $true
   Assert-Installed $canonical (Join-Path $fakeHome ".gemini/config/skills") $true
   Write-Host "ok - global install"
 
   Invoke-Installer @{ Scope = "Global"; HomeDir = $fakeHome; Uninstall = $true }
-  Assert-Removed @($canonical, (Join-Path $fakeHome ".claude/skills"), (Join-Path $fakeHome ".gemini/config/skills"))
+  Assert-Removed @($canonical, (Join-Path $fakeHome ".claude/skills"), (Join-Path $fakeHome ".codex/skills"), (Join-Path $fakeHome ".gemini/config/skills"))
   Assert-True (Test-Path -LiteralPath (Join-Path $RepoRoot "skills/$($Skills[0])/SKILL.md")) "uninstall touched the source skills"
   Write-Host "ok - global uninstall"
 
