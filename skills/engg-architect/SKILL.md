@@ -3,7 +3,7 @@ name: engg-architect
 description: Runs a rigorous, tech-agnostic Staff-level architectural grill session and produces a decision-complete Engineering Design Doc (EDD) and ADRs for any software surface (backend, web client, mobile client, game client, database, infrastructure/DevOps). Use when designing a new system, scaffolding a project, locking technical contracts, or formalizing architecture before planning or coding.
 license: Apache-2.0
 metadata:
-  version: "1.0.0"
+  version: "2.0.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---
@@ -44,13 +44,13 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
    - When the user says "pick best practice," propose one concrete opinionated default, explain the trade-off in one sentence, and log it under **Recorded Assumptions**.
 4. **Produce the Locked Engineering Design Doc (EDD) & Key ADRs:**
    - Goals & Explicit Non-Goals
-   - System & Module Architecture (diagram/tree enforcing dependency direction and Ports & Adapters)
+   - System & Module Architecture: C4 **context** and **container** views (Mermaid, so they live in the repo and diff in review) plus a module tree showing dependency direction and Ports & Adapters. Default to a **modular monolith**; split into services only when a stated budget or team boundary requires it, and write the ADR that says which.
    - Chosen Tech Stack & Rationale (with pinned target versions)
    - Explicit Contracts (API/Events/IPC/State Schemas) & Data/Persistence Model
-   - Threat Model & Defense-in-Depth Controls
+   - Threat Model & Defense-in-Depth Controls, with the target **OWASP ASVS 5.0 level** (L1, L2 or L3, justified by the data and the exposure) and the requirement areas it commits to, cited with the version (e.g. `v5.0.0-6.2.1`)
    - Hard Performance, Latency/Frame, & Resource Budgets
    - Observability, Testing Strategy & Lifecycle/Deployment Model
-   - Architecture Decision Records (ADRs) for every major irreversible choice
+   - Architecture Decision Records for every major irreversible choice, in **MADR 4.0** form (context and problem, decision drivers, considered options, decision outcome, consequences), stored as `docs/decisions/NNNN-<slug>.md`
    - Recorded Assumptions & Accepted Trade-Offs
 5. **Write and Compile the Architecture Contract:**
    - Translate the module architecture into `.engg/architecture.yaml`: layers inner -> outer, minimal `may_import`, `external` limits on the domain, `modules` isolation for vertical slices, and `targets` for the chosen stack.
