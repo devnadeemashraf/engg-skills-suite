@@ -1,0 +1,10 @@
+# Normalise to LF in the repo and in checkouts, so shell scripts run and the validator sees one format
+# regardless of core.autocrlf.
+* text=auto eol=lf
+
+# Binary assets (none yet; listed so future additions are not mangled)
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.pdf binary
