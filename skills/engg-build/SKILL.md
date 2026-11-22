@@ -26,6 +26,7 @@ Implement one planned chunk at a time using disciplined **Red -> Green -> Refact
 5. **No shortcuts:** Never swallow errors, bypass type safety (`any`/`unsafe` without documented proof), omit timeouts/bounds, hardcode secrets, or weaken a failing test to make it pass.
 6. **The architecture contract is part of green:** if `.engg/architecture.yaml` exists, the compiled enforcer runs with the tests, and a new violation means red. Never touch the ratchet baseline to make room for new code.
 7. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+8. **Stay inside the mode and the baseline:** before starting, check the chunk against `.engg/delivery.yaml` (`references/delivery-modes.md`). In `mvp-first` it must serve the `core_flow` or a critical item. With `baseline: existing`, never change the architecture, layout or tooling; log improvements to the backlog instead.
 
 ## Workflow
 

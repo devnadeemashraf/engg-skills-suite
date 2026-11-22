@@ -47,3 +47,27 @@ def test_all_skills_share_the_suite_metadata() -> None:
         meta = yaml.safe_load(text.split("---", 2)[1])["metadata"]
         assert meta["suite"] == "engg-skills-suite"
         assert meta["version"] == "2.0.0", f"{skill} is still at {meta['version']}"
+
+
+# Skills that plan or build must all know the delivery mode and the baseline rule.
+PLANS_OR_BUILDS = ["engg-architect", "engg-build", "engg-deep-audit", "engg-extend", "engg-ideate",
+                   "engg-plan", "engg-refactor", "engg-roadmap"]
+
+
+@pytest.mark.parametrize("skill", PLANS_OR_BUILDS)
+def test_planning_and_building_skills_follow_the_delivery_mode(skill: str) -> None:
+    text = (REPO_ROOT / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
+    assert "references/delivery-modes.md" in text
+    assert (REPO_ROOT / "skills" / skill / "references" / "delivery-modes.md").is_file()
+
+
+def test_delivery_modes_example_is_valid() -> None:
+    doc = (REPO_ROOT / "shared" / "references" / "delivery-modes.md").read_text(encoding="utf-8")
+    example = doc.split("```yaml", 1)[1].split("```", 1)[0]
+    data = yaml.safe_load(example)
+    assert data["mode"] in {"mvp-first", "full-sequence"}
+    assert data["baseline"] in {"greenfield", "existing", "redo"}
+    for mode in ("mvp-first", "full-sequence"):
+        assert f"`{mode}`" in doc
+    for baseline in ("greenfield", "existing", "redo"):
+        assert f"`{baseline}`" in doc

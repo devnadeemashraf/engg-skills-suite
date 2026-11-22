@@ -29,6 +29,7 @@ Tools build the map; you judge only what tools can't. Reading thousands of lines
 5. **State lives on disk, not in memory.** The ledger (`scripts/ledger.py`) is the source of truth for progress. After each unit, its findings are in a file and its content can leave your working context.
 6. **Evidence or it didn't happen.** Follow the Evidence Protocol in `references/engineering-constitution.md`: cite `file:line` or a tool result, triage every tool finding, and require two signals before proposing deletion. Findings follow `references/finding-schema.md`.
 7. **Say what wasn't checked.** Every input the map lists as "not run", and every contract rule the compiler marks NOT COVERED, appears in the report as unchecked.
+8. **Shape the remediation by the delivery mode** (`references/delivery-modes.md`; ask if `.engg/delivery.yaml` is missing). In `mvp-first`, Wave 1 holds only the P0s and what blocks the `core_flow`; everything else goes to later waves or the backlog. The audit itself is never shortened, and work that drifted from the recorded mode is a finding.
 
 ## Workflow
 

@@ -39,3 +39,8 @@ groups:
     files:
       - scripts/ratchet.py
     skills: [engg-audit, engg-deep-audit, engg-refactor, engg-ship]
+
+  delivery:
+    files:
+      - references/delivery-modes.md
+    skills: [engg-architect, engg-build, engg-deep-audit, engg-extend, engg-ideate, engg-plan, engg-refactor, engg-roadmap]

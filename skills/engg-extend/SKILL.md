@@ -26,6 +26,7 @@ Grow an in-progress codebase rapidly without architectural drift by enforcing st
 5. **Strict TDD + Post-Audit:** Follow `engg-build` test-first discipline and finish with `engg-audit` (Mode A).
 6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
 7. **Respect the architecture contract:** if `.engg/architecture.yaml` exists (schema: `references/architecture-contract.md`), use it to place the new slice or adapter in the right layer and module. Before declaring done, run `scripts/compile_contract.py --check` and then the enforcer command it prints. If the change needs a new layer or dependency direction, change the contract with the owner first; never work around it.
+8. **Stay inside the mode and the baseline:** check the new slice or adapter against `.engg/delivery.yaml` (`references/delivery-modes.md`). In `mvp-first` it must serve the `core_flow` or the current iteration's goal. With `baseline: existing`, extend the existing architecture and tools; never replace them.
 
 ## Workflow — Mode A: Vertical Feature Module
 
