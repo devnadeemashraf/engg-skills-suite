@@ -40,7 +40,8 @@ limits:                          # optional; not compiled; checked by engg-deep-
   max_function_complexity: 12
 
 targets:                         # required; at least one enforcer to compile for
-  typescript: { tsconfig: tsconfig.json }        # dependency-cruiser; tsconfig is optional
+  typescript: { tsconfig: tsconfig.json, parser: swc }   # dependency-cruiser; both optional. parser: acorn | swc | tsc
+                                                         # (TypeScript 7.0.x needs swc with @swc/core installed)
   python: { root_package: shop, source_root: src } # import-linter
   go: {}                                         # go-arch-lint
 ```

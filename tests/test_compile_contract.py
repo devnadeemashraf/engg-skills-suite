@@ -210,6 +210,18 @@ def test_tsconfig_option() -> None:
     assert '"fileName": "tsconfig.build.json"' in files["dependency-cruiser.cjs"]
 
 
+def test_parser_option() -> None:
+    data = base_contract(targets={"typescript": {"parser": "swc"}})
+    files, _ = cc.compile_all(cc.parse_contract(data), "c.yaml")
+    assert '"parser": "swc"' in files["dependency-cruiser.cjs"]
+    assert '"parser"' not in cc.compile_all(cc.parse_contract(base_contract()), "c.yaml")[0]["dependency-cruiser.cjs"]
+
+
+def test_unknown_parser_rejected() -> None:
+    errors = errors_of(base_contract(targets={"typescript": {"parser": "babel"}}))
+    assert any("targets.typescript.parser: must be one of" in e for e in errors)
+
+
 def test_python_output_and_coverage() -> None:
     contract = cc.parse_contract(yaml.safe_load((FIXTURES / "contract-py/.engg/architecture.yaml").read_text(encoding="utf-8")))
     files, cov = cc.compile_all(contract, "c.yaml")
@@ -378,3 +390,17 @@ def test_import_linter_catches_planted_violation(tmp_path: Path) -> None:
     assert "Layer 'domain' must not import layer 'adapters' BROKEN" in proc.stdout
     assert "shop.orders.domain.leak -> shop.orders.adapters.repo" in proc.stdout
     assert "1 broken" in proc.stdout
+
+
+@pytest.mark.skipif(DEPCRUISE is None, reason="dependency-cruiser not installed (npm ci)")
+def test_depcruise_honours_an_explicit_parser(tmp_path: Path) -> None:
+    repo = prepare_ts(tmp_path)
+    contract = repo / ".engg/architecture.yaml"
+    contract.write_text(contract.read_text(encoding="utf-8").replace("  typescript: {}", "  typescript: { parser: tsc }"),
+                        encoding="utf-8")
+    assert run_cli(repo).returncode == 0
+    assert '"parser": "tsc"' in (repo / ".engg/generated/dependency-cruiser.cjs").read_text(encoding="utf-8")
+    clean = depcruise(repo)
+    assert clean.returncode == 0, clean.stdout + clean.stderr
+    (repo / "src/orders/domain/leak.ts").write_text('import { seed } from "../adapters/order-repo";\nexport const x = seed;\n', encoding="utf-8")
+    assert "error domain-not-to-adapters" in depcruise(repo).stdout

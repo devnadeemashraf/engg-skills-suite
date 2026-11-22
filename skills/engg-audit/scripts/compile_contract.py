@@ -34,7 +34,10 @@ STYLES = {"hexagonal", "clean", "layered", "feature-sliced", "mvvm", "ecs", "mod
 TOP_KEYS = {"version", "name", "style", "layers", "modules", "rules", "limits", "targets"}
 LAYER_KEYS = {"name", "paths", "may_import", "external"}
 LIMIT_KEYS = {"max_file_lines", "max_function_lines", "max_function_complexity", "max_fan_out"}
-TARGETS = {"typescript": {"tsconfig"}, "python": {"root_package", "source_root"}, "go": set()}
+TARGETS = {"typescript": {"tsconfig", "parser"}, "python": {"root_package", "source_root"}, "go": set()}
+# dependency-cruiser parsers. TypeScript 7.0.x is outside dependency-cruiser 18.8's supported range for its
+# "tsc" parser, so such projects need "swc" (with @swc/core installed); "acorn" handles plain JavaScript.
+TS_PARSERS = {"acorn", "swc", "tsc"}
 NAME_RE = re.compile(r"^[a-z0-9]+(-[a-z0-9]+)*$")
 GLOB_RE = re.compile(r"^[A-Za-z0-9_.@*/-]+$")
 PACKAGE_RE = re.compile(r"^(@[a-z0-9][a-z0-9._-]*/)?[A-Za-z0-9][A-Za-z0-9._/-]*$")
@@ -228,6 +231,10 @@ def parse_contract(data: object) -> Contract:
             errors.append(f"targets.{tname}: unknown option '{key}'")
         clean_targets[tname] = {k: v for k, v in opts.items() if isinstance(v, str)}
 
+    parser = clean_targets.get("typescript", {}).get("parser")
+    if parser is not None and parser not in TS_PARSERS:
+        errors.append(f"targets.typescript.parser: must be one of {sorted(TS_PARSERS)}")
+
     if "python" in clean_targets:
         py = clean_targets["python"]
         if not PY_IDENT_RE.match(py.get("root_package", "")):
@@ -380,6 +387,8 @@ def compile_typescript(c: Contract, contract_path: str, cov: Coverage) -> str:
     options: dict = {"doNotFollow": {"path": "node_modules"}, "tsPreCompilationDeps": True}
     if "tsconfig" in c.targets["typescript"]:
         options["tsConfig"] = {"fileName": c.targets["typescript"]["tsconfig"]}
+    if "parser" in c.targets["typescript"]:
+        options["parser"] = c.targets["typescript"]["parser"]
     config = {"forbidden": forbidden, "options": options}
     return f"// {HEADER.format(contract=contract_path)}\nmodule.exports = {json.dumps(config, indent=2)};\n"
 
