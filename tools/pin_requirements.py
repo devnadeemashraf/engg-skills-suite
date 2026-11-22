@@ -30,6 +30,9 @@ DEV_PINS = {
     "rich": ("15.0.0", None),
     "markdown-it-py": ("4.3.0", None),
     "mdurl": ("0.1.2", None),
+    # lizard: per-function complexity, parsed by the deep audit's map step.
+    "lizard": ("1.26.1", None),
+    "pathspec": ("1.1.1", None),
 }
 
 # requirements-lint.txt: GitHub Actions security linter (ships as a self-contained wheel).
