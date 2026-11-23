@@ -36,7 +36,7 @@ The skills follow the open [Agent Skills specification](https://agentskills.io/s
 
 ## How it works
 
-Five ideas run through every skill. You don't need to memorize them; the skills apply them for you.
+Six ideas run through every skill. You don't need to memorize them; the skills apply them for you.
 
 ### 1. Ask first, then stay in lane: delivery modes
 
@@ -79,6 +79,19 @@ Every change gets a **risk tier**, and the tier decides how much proof it needs:
 
 - **Evidence:** every claim cites a file and line or a tool result, and "verified" means a command ran and passed. Nothing is deleted unless two independent signals agree it's unused.
 - **The ratchet:** in existing code, the ratchet (`ratchet.py`) records today's violations as a baseline. CI then fails on any new one, and the baseline can only shrink. Messy code gets cleaner every week and can't quietly slide back.
+
+### 6. A working loop that survives the session
+
+Every step leaves the project in files, so any new session, on any model, knows where the work stands without the previous chat:
+
+- **`docs/HANDOFF.md`** is the pointer: what's in progress, bugs to fix first, open questions, and what comes next.
+- **`docs/BLUEPRINT.md`** is the plan, chunk by chunk. Finished chunks collapse to one line, and only the next wave is written out in full.
+- **`docs/EDD.md`** is the big picture, kept current as modules and decisions land. `docs/CHARTER.md` and `docs/decisions/` sit beside it.
+- **`AGENTS.md`** (and a one-line `CLAUDE.md`) gives the agent its commands, the build, debug and review loops, the coding rules, and a never-list.
+
+Four small scripts keep it cheap. `brief.py` prints the handoff and the one next thing to do, with the design sections that chunk cites. `map.py` lists files with their exported symbols, so the agent finds before it reads. `check.py` runs your gates with one line per passing stage. `attribution_check.py` fails any commit, PR or added line that credits an AI tool: nothing the skills produce carries AI attribution.
+
+If your project already runs its own loop, the skills use it instead of adding a second one.
 
 ## The skills
 
@@ -182,6 +195,11 @@ The architecture and tooling are already set, so the baseline is `existing` and 
 
 | Path | What it is | Commit it? |
 |---|---|---|
+| `AGENTS.md`, `CLAUDE.md` | Commands, loops and rules every agent session follows | Yes |
+| `docs/HANDOFF.md` | Where the work stands and what's next | Yes |
+| `docs/BLUEPRINT.md` | The chunk plan, with finished chunks as one line each | Yes |
+| `docs/CHARTER.md`, `docs/EDD.md`, `docs/decisions/` | The charter, the living design doc, and decision records | Yes |
+| `.engg/check.toml` | Your gate commands, for `check.py` | Yes |
 | `.engg/delivery.yaml` | Your delivery mode, baseline and core flow | Yes |
 | `.engg/architecture.yaml` | The architecture contract | Yes |
 | `.engg/generated/` | Checker configs compiled from the contract | Yes |
@@ -212,8 +230,9 @@ cd engg-skills-suite
 ```text
 skills/           the 13 skills: each a SKILL.md plus references/ and scripts/ it loads on demand
 shared/           single source for files several skills use (synced into skills/ by tools/sync_shared.py)
-  references/     engineering constitution, delivery modes, architecture contract, toolchain, tool consent
-  scripts/        compile_contract.py, ratchet.py, toolcheck.sh / toolcheck.ps1
+  references/     engineering constitution, working loop, delivery modes, architecture contract, toolchain, tool consent
+  scripts/        brief.py, map.py, check.py, attribution_check.py, compile_contract.py, ratchet.py, toolcheck.sh / .ps1
+  assets/         the AGENTS.md template engg-plan fills in
 evals/            fixture repos with known defects, answer keys, a scorer, and recorded runs
 docs/             SETUP.md, WORKFLOWS.md, and the v2 design plan
 tools/            validator, shared-file sync, requirement pinning, tool-output capture

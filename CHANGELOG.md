@@ -2,6 +2,37 @@
 
 All notable changes to this project. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- **The working loop** (`shared/references/working-loop.md`, in every skill). Each step now leaves the project in files, so a new session on any model can resume without the previous chat:
+  - `docs/HANDOFF.md`, the pointer: in progress, fix first, questions for the human, gotchas, next.
+  - `docs/BLUEPRINT.md`, the plan in `engg-plan`'s card format. Finished chunks collapse to one Done line; only the next wave is detailed.
+  - `docs/CHARTER.md` (`engg-ideate`) and `docs/EDD.md` (`engg-architect`), now saved to known paths with numbered sections that chunks cite. The EDD is kept current as the project's big picture.
+  - `AGENTS.md` and `CLAUDE.md`, written by `engg-plan` from `assets/agents-template.md`: commands, the chunk, debug and review loops, the wave gate, coding rules, a self-review checklist and a never-list.
+- **Four scripts** (Python 3.10+, standard library only):
+  - `brief.py` prints the handoff and the one next thing to do (In progress, then Fix first, then the next chunk whose dependencies are done), with the EDD and charter sections it cites. It also says when a wave gate is due.
+  - `map.py` lists files with their exported symbols (TS/JS, Python, Go, Rust, Java, Kotlin, C#), or directory counts for a large repo.
+  - `check.py` runs the gates in `.engg/check.toml`: one line per passing stage, and only the tail of a failing one.
+  - `attribution_check.py` fails on AI attribution in commit messages, PR text or added lines. Use it in a commit-msg hook and in CI.
+- **Constitution §7, Authorship:** code, commits, PRs, docs and release notes carry no AI attribution.
+
+### Changed
+
+- **The user's explicit request outranks the skills' defaults.** A skill that would block a request names the rule and asks, instead of silently refusing or doing less.
+- **Documents are no longer deferred** by `mvp-first`. The charter, EDD, ADRs, blueprint, handoff, agent file, README and any document the user asks for are always written; only optional polish documentation waits.
+- **`engg-architect`** writes the EDD and ADRs as decisions lock. Only implementation code waits for approval.
+- **`engg-deep-audit`** no longer stops when there is no contract. It drafts the as-is contract and continues once the owner agrees. When the user asks for a redesign, the audit hands off to `engg-architect` with `baseline: redo`.
+- **An explicit "re-architect" or "start over"** sets `baseline: redo` at once.
+- **Unverifiable facts** (no network, no tool) are marked `unverified` and the work goes ahead, instead of being refused.
+- **Fewer tokens per run.**
+  - Skills read the toolchain registry only for the tools they need, delivery modes only when `.engg/delivery.yaml` is missing, and the constitution by section where a skill needs only part of it.
+  - They take the next chunk from `brief.py` instead of restating it.
+  - Fixed reading drops about 17% across one run of each skill, and 30–33% for `engg-build`, `engg-extend` and `engg-architect`.
+- **Chunk cards** gain `Cites`, `Follow`, `Files in scope` and numbered, derived test cases, each of which becomes a test named `[<ID> #<n>]`.
+- **`engg-audit`** describes adversarial review plainly instead of asking for a "hostile persona".
+
 ## [2.0.0] - 2026-11-23
 
 v2 turns the suite from written guidance into **checked** guidance. Standards are enforced by tools, claims need evidence, and the agent asks before it assumes. The design and its findings, phase by phase, are in [docs/V2_PLAN.md](docs/V2_PLAN.md).

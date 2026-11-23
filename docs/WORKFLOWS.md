@@ -39,9 +39,10 @@ Write the approved hardened roadmap to docs/ROADMAP.md, then run /engg-plan on M
 **Goal:** Ship one clean, verified, adversarially audited vertical increment without architectural drift.
 
 ```text
-/engg-build Implement Chunk C1 from our plan.
-Follow strict TDD: list the 5-category Test Matrix first, write the failing tests, implement the minimal clean production code upholding SOLID/DRY/KISS/ATOMIC, and run the full test/lint/typecheck/race suite.
+/engg-build Next chunk.
 ```
+
+The agent runs `brief.py`, which prints the handoff and the next ready chunk from `docs/BLUEPRINT.md`, with the design sections it cites. It writes the chunk's test cases as failing tests, makes the smallest change that passes, and runs your gates with `check.py`. Name a chunk (`Implement C4`) to pick one yourself. A new session needs no recap: `AGENTS.md` and the handoff carry the state.
 
 **Mandatory immediately after green:**
 
@@ -49,6 +50,8 @@ Follow strict TDD: list the 5-category Test Matrix first, write the failing test
 /engg-audit Run Mode A on all files created or modified in Chunk C1 (including the tests).
 Fix every P0 and P1 finding with regression tests, re-run verification, and draft an atomic Conventional Commit message.
 ```
+
+For T2 and T3 chunks, run the audit in a fresh session, on a different model if you can. When the chunk merges, the agent closes it in the blueprint (one Done line) and updates the handoff, so the next session starts in the right place.
 
 ---
 
