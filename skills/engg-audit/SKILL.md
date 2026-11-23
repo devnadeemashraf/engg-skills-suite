@@ -3,7 +3,7 @@ name: engg-audit
 description: Performs a ruthless, adversarial Principal-level audit of a change (a new code chunk, diff, or pull request) or of a spec or plan written by another human or LLM. Identifies bugs, security vulnerabilities, architectural violations, SOLID/DRY/KISS problems, performance bottlenecks, reliability gaps, and weak tests, then fixes P0/P1 findings with regression tests. Use when reviewing a diff or PR before commit or merge, or when tightening an external spec. For a whole codebase or subsystem, use engg-deep-audit.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

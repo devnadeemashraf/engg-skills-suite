@@ -3,7 +3,7 @@ name: engg-build
 description: Executes a single implementation chunk using strict Test-First Development (Red-Green-Refactor), with test depth and gates scaled to the chunk's risk tier (property-based tests for parsers and invariants, mutation testing for critical code). Enforces SOLID, DRY, KISS, ATOMIC design, the architecture contract, and production invariants across backend, web, mobile, game, database, and DevOps stacks. Use when implementing a planned chunk, writing new production behaviour test-first, or fixing a defect with a failing test first. For behaviour-preserving cleanup, use engg-refactor.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

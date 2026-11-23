@@ -3,7 +3,7 @@ name: engg-plan
 description: Decomposes an approved Engineering Design Doc (EDD), feature spec, hardened roadmap milestone, or deep-audit report into small, atomic, MVP-first vertical execution chunks organized into progressive waves. Each chunk carries a risk tier, gates written as exact commands, a ratchet delta, and a rollback path. Use when breaking down a project into implementation milestones, creating a chunk roadmap, sequencing dependencies, or converting an audit report into an actionable remediation plan.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

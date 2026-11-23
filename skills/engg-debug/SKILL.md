@@ -3,7 +3,7 @@ name: engg-debug
 description: Runs an evidence-driven scientific debugging and performance profiling loop across backend, web, mobile, game, database, and infrastructure systems. Enforces reproduction, measurement, hypothesis isolation, root-cause fixes, and permanent regression tests instead of guesswork patching. Use when investigating bugs, crashes, race conditions, memory leaks, latency spikes, frame drops, or slow queries.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

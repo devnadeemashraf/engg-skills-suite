@@ -3,7 +3,7 @@ name: engg-deep-audit
 description: Audits an entire existing codebase or subsystem layer by layer and unit by unit against its agreed architecture contract, using open-source tools (code graph, complexity, duplication, dead-code, secret and dependency scanners) to map the system first, then reviewing one bounded unit at a time with progress kept on disk. Produces a severity-ranked report, a strip list of everything unnecessary, a move list to reach the contract, and remediation waves. Read-only. Use when auditing a whole repository, onboarding onto a messy codebase, measuring how far code has drifted from its architecture, or planning a cleanup. Not for a single diff or PR (use engg-audit).
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

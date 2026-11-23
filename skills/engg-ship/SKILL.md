@@ -3,7 +3,7 @@ name: engg-ship
 description: Prepares, automates, hardens, and executes production delivery. Covers CI/CD quality gates (including the architecture contract and violation ratchet), supply-chain security (SHA-pinned actions, workflow linting, SBOMs, SLSA provenance), merge queues, containerization, Infrastructure-as-Code, observability, feature-flagged progressive rollouts with tested rollbacks, DORA delivery metrics, and atomic Git commits. Use when setting up or hardening CI/CD, writing Dockerfiles or IaC, preparing a release, verifying production readiness, or rolling software out and back safely.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

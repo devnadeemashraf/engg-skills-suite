@@ -3,7 +3,7 @@ name: engg-roadmap
 description: Grills, reality-checks, re-sequences, and hardens an existing product or engineering roadmap against the actual codebase, delivery constraints, and technical risks, then routes each milestone to the rest of the engineering skill suite (engg-architect, engg-plan, engg-build, engg-extend, engg-refactor, engg-audit, engg-deep-audit, engg-research, engg-debug, engg-data, engg-ship). Use when improving an in-progress roadmap, cutting scope bloat, de-risking milestones, aligning roadmap promises with real code, or accelerating shipping velocity.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

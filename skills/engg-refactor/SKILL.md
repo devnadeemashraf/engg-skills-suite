@@ -3,7 +3,7 @@ name: engg-refactor
 description: Carries out a codebase cleanup safely, one small commit at a time. Pins current behaviour with characterization tests, deletes dead code only on two independent signals, moves, splits and merges code toward the agreed architecture contract, and enforces a ratchet so violations only ever go down. Use when executing deep-audit remediation waves, stripping unnecessary code, reorganising a messy codebase layer by layer, or doing any behaviour-preserving restructure. Behaviour changes such as security fixes are done test-first, in separate commits. For new features use engg-build or engg-extend.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

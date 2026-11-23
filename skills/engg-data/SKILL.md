@@ -3,7 +3,7 @@ name: engg-data
 description: Designs schemas, data models, indexing strategies, query plans, and zero-downtime migrations across relational, NoSQL, caching, and analytical stores. Use when modeling domain data, writing schema migrations, optimizing queries/indexes, planning backfills, or validating consistency and backup/recovery guarantees.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

@@ -3,7 +3,7 @@ name: engg-extend
 description: Extends an existing or in-progress codebase cleanly by either adding a new vertical business feature module or implementing a new swappable infrastructure/platform adapter behind a port interface with shared contract tests. Use when adding features, integrating new databases/APIs/SDKs/engines, or swapping adapters without breaking architectural boundaries.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---
