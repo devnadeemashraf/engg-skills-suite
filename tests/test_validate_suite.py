@@ -177,7 +177,7 @@ def test_brand_name_in_reference_fails(tmp_path: Path) -> None:
 
 def test_brand_exemption_covers_only_the_attribution_checker(tmp_path: Path) -> None:
     body = VALID_BODY + "Run `scripts/attribution_check.py` and `scripts/other.py`.\n"
-    vendor = "PATTERN = 'noreply@anthropic.com'\n"
+    vendor = "VENDORS = ['anthropic']\n"
     make_skill(tmp_path, body=body, refs={"references/guide.md": "# Guide\n",
                                           "scripts/attribution_check.py": vendor, "scripts/other.py": vendor})
     errors = errors_for(tmp_path)
