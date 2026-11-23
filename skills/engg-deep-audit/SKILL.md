@@ -22,14 +22,15 @@ Tools build the map; you judge only what tools can't. Reading thousands of lines
 
 ## Non-Negotiable Rules
 
-1. **Read-only.** Never edit production code during the audit. Fixes run later through `engg-plan` → `engg-refactor` / `engg-build`.
-2. **No contract, no audit.** The audit measures code against `.engg/architecture.yaml` (schema: `references/architecture-contract.md`). If it's missing, stop and offer the brownfield path in Phase 2.
-3. **Tools first, then judgment.** Build the machine map (Phase 1) before reading any code. Use `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) to see what's installed, pick tools from `references/toolchain.md`, and install nothing without `references/tool-consent.md`.
+1. **Read-only for production code.** Never edit it during the audit; fixes run later through `engg-plan` → `engg-refactor` / `engg-build`. Writing the audit's own files, the report, and any document the user asks for (a proposal, a redesign brief) is part of the job.
+2. **No contract, no conformance verdict.** The audit measures code against `.engg/architecture.yaml` (schema: `references/architecture-contract.md`). If it's missing, draft the as-is contract (Phase 2) and continue once the user agrees. If the user has asked for a redesign, that's `baseline: redo`: finish the map and the findings, then hand the redesign to `engg-architect` (`references/delivery-modes.md` §5).
+3. **Tools first, then judgment.** Build the machine map (Phase 1) before reading any code. Use `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) for the tools in `references/tool-recipes.md`, read only the missing tools' rows in `references/toolchain.md`, and install nothing without `references/tool-consent.md`.
 4. **Bounded reading.** Review one ledger unit at a time and read only its files and context pack. For anything else, query the graph (`graphify explain`, `graphify affected`) or search (`rg`).
 5. **State lives on disk, not in memory.** The ledger (`scripts/ledger.py`) is the source of truth for progress. After each unit, its findings are in a file and its content can leave your working context.
 6. **Evidence or it didn't happen.** Follow the Evidence Protocol in `references/engineering-constitution.md`: cite `file:line` or a tool result, triage every tool finding, and require two signals before proposing deletion. Findings follow `references/finding-schema.md`.
 7. **Say what wasn't checked.** Every input the map lists as "not run", and every contract rule the compiler marks NOT COVERED, appears in the report as unchecked.
-8. **Shape the remediation by the delivery mode** (`references/delivery-modes.md`; ask if `.engg/delivery.yaml` is missing). In `mvp-first`, Wave 1 holds only the P0s and what blocks the `core_flow`; everything else goes to later waves or the backlog. The audit itself is never shortened, and work that drifted from the recorded mode is a finding.
+8. **Shape the remediation by the delivery mode** (`.engg/delivery.yaml`; only if it's missing, ask the question in `references/delivery-modes.md` §1). In `mvp-first`, Wave 1 holds only the P0s and what blocks the `core_flow`; everything else goes to later waves or the backlog. The audit itself is never shortened, and work that drifted from the recorded mode is a finding.
+9. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -45,7 +46,7 @@ Tools build the map; you judge only what tools can't. Reading thousands of lines
 - Read `$RUN/map.md`: layer sizes, files in no layer, overlaps, hotspots, dead-code candidates, duplication, cycles, and the unit plan.
 
 **Phase 2: Contract gate**
-- If `.engg/architecture.yaml` is missing, **stop**. Offer to draft the as-is contract from the directory layout and graph communities (`GRAPH_REPORT.md`), then hand off to `engg-architect` (brownfield mode) to agree the to-be contract with the owner. Resume once it is ratified.
+- If `.engg/architecture.yaml` is missing, draft the as-is contract from the directory layout and graph communities (`GRAPH_REPORT.md`) and show it to the owner. Continue once they agree it describes the code; agreeing the to-be contract is `engg-architect`'s job (brownfield mode, or `redo` if they asked for a redesign).
 - Run `python scripts/compile_contract.py` and keep its coverage report for the final report.
 
 **Phase 3: Unit plan**
@@ -76,7 +77,8 @@ Tools build the map; you judge only what tools can't. Reading thousands of lines
     - Wave 4: moves, splits and merges toward the contract, inside-out
     - Wave 5: P2/P3 simplification
 
-**Phase 7: Enforcement handoff**
+**Phase 7: Enforcement handoff and the pointer**
+- Create or update `docs/HANDOFF.md` (Stage `audit`, Next: `engg-plan` turns the waves into `docs/BLUEPRINT.md`), pointing at `$RUN/REPORT.md`. The audit folder is git-excluded, so record the run id there.
 - Propose (don't apply) wiring the compiled enforcer, gitleaks, and the formatter and linter into pre-commit and CI.
 - Propose recording today's violations as the ratchet baseline with `python scripts/ratchet.py record --baseline .engg/baseline/violations.json --depcruise $RUN/raw/depcruise.json --gitleaks $RUN/raw/gitleaks.json`, so new violations block merges while old ones are paid down wave by wave (`engg-refactor` runs the waves).
 

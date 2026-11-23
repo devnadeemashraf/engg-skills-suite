@@ -28,8 +28,9 @@ Turn a messy codebase into a clean one without breaking it. Every step is small,
 4. **The ratchet only goes down.** Record the baseline with `scripts/ratchet.py record` before the first change. After every commit, `ratchet.py check` must pass. Shrink the baseline with `ratchet.py update`; never add entries to it.
 5. **Never weaken a gate to get green:** no skipped or deleted tests, no loosened contract, no raised thresholds, no new suppressions. If a gate is wrong, raise it with the owner.
 6. **One transformation kind per commit,** each passing the gates: tests, typecheck, linter, compiled architecture enforcer (`scripts/compile_contract.py`, schema in `references/architecture-contract.md`), ratchet.
-7. **Use tools, with consent.** Prefer automated refactors (LSP rename and move, `ast-grep` rewrites) over hand edits. Check what's installed with `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`), pick from `references/toolchain.md`, and follow `references/tool-consent.md` before installing.
-8. **Refactors respect the baseline:** cleanup moves code toward the existing contract. It never redesigns the architecture or swaps tools unless `.engg/delivery.yaml` says `baseline: redo` (`references/delivery-modes.md`). In `mvp-first`, refactor only what blocks the `core_flow` or the current wave.
+7. **Use tools, with consent.** Prefer automated refactors (LSP rename and move, `ast-grep` rewrites) over hand edits. Check what's installed with `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`), read only those tools' rows in `references/toolchain.md`, and follow `references/tool-consent.md` before installing.
+8. **Refactors respect the baseline:** cleanup moves code toward the existing contract. It never redesigns the architecture or swaps tools unless `.engg/delivery.yaml` says `baseline: redo` (`references/delivery-modes.md` §5). In `mvp-first`, refactor only what blocks the `core_flow` or the current wave.
+9. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -42,7 +43,7 @@ Turn a messy codebase into a clean one without breaking it. Every step is small,
    3. Run the gates and `ratchet.py check`. If anything was fixed, run `ratchet.py update` **before** committing.
    4. Commit the change, its tests, and the smaller baseline together, with the finding ids in the message. CI runs `ratchet.py check --require-tight`.
 5. **Wave report.** Show the ratchet before and after, the findings done, skipped (and why) and deferred, and the gate results with their commands.
-6. **Hand off.** Run `engg-audit` (Mode A) on the wave's diff. When all waves are done, re-run `engg-deep-audit` to confirm the drift is gone.
+6. **Hand off.** Run `engg-audit` (Mode A) on the wave's diff, then close each chunk and update `docs/HANDOFF.md` (`references/working-loop.md` §3). When all waves are done, re-run `engg-deep-audit` to confirm the drift is gone.
 
 ## Gotchas
 

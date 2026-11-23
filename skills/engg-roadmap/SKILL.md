@@ -25,8 +25,9 @@ Pressure-test an existing roadmap against engineering reality, strip out drag an
 3. **Grill interactively before rewriting:** Run **2 to 4 focused Grill Rounds** (5–7 sharp questions per round). Never silently rewrite a roadmap without resolving priority, risk, and scope trade-offs with the owner.
 4. **Enforce the 50% Timeline Razor:** Every hardening pass must identify what survives if the delivery window is cut in half, forcing crisp V-Next vs. Deferred boundaries.
 5. **Route every hardened milestone into the suite:** Every surviving item must map explicitly to its next execution skill (`engg-research`, `engg-architect`, `engg-deep-audit`, `engg-audit`, `engg-plan`, `engg-build`, `engg-extend`, `engg-refactor`, `engg-data`, `engg-debug`, or `engg-ship`)—never leave vague prose milestones.
-6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+6. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
 7. **Respect the delivery mode and the baseline:** read `.engg/delivery.yaml`, or ask the question in `references/delivery-modes.md` if it's missing. In `mvp-first`, Milestone 1 delivers the `core_flow`, and anything that doesn't serve it moves to a later milestone or the backlog. With `baseline: existing`, never schedule redesigns, re-layouts or tool swaps unless the user asked for them.
+8. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -45,6 +46,7 @@ Pressure-test an existing roadmap against engineering reality, strip out drag an
    - Output an item-by-item **Roadmap Delta** tagged with `[KEEP]`, `[RE-SEQUENCE]`, `[SPLIT]`, `[REVISE]`, `[ADD — PREREQ]`, or `[CUT — DEFER]`.
 4. **Lock Living `docs/ROADMAP.md` & Suite Handoff Table:**
    - Once approved, write the hardened roadmap using the template in `references/roadmap-hardening-template.md`, including a **Decisions & Cuts Log** and a **Next-Skill Routing Table**.
+   - Create or update `docs/HANDOFF.md` (Stage `plan`, Next: the first milestone and the skill that runs it).
 5. **Seamless Handoff to the Rest of the Suite:**
    - Unknown library/API or breaking upgrade in next milestone -> `engg-research`
    - Major unarchitected subsystem or contract gap -> `engg-architect`

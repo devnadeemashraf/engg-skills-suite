@@ -175,6 +175,16 @@ def test_brand_name_in_reference_fails(tmp_path: Path) -> None:
     assert any("forbidden brand name 'amazon'" in e for e in errors_for(tmp_path))
 
 
+def test_brand_exemption_covers_only_the_attribution_checker(tmp_path: Path) -> None:
+    body = VALID_BODY + "Run `scripts/attribution_check.py` and `scripts/other.py`.\n"
+    vendor = "PATTERN = 'noreply@anthropic.com'\n"
+    make_skill(tmp_path, body=body, refs={"references/guide.md": "# Guide\n",
+                                          "scripts/attribution_check.py": vendor, "scripts/other.py": vendor})
+    errors = errors_for(tmp_path)
+    assert any("scripts/other.py: contains forbidden brand name 'anthropic'" in e for e in errors)
+    assert not any("attribution_check.py" in e for e in errors)
+
+
 def test_brand_word_boundary_allows_metadata(tmp_path: Path) -> None:
     make_skill(tmp_path, refs={"references/guide.md": "Record metadata and metadata keys.\n"})
     assert errors_for(tmp_path) == []

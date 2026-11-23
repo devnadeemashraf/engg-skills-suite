@@ -19,12 +19,13 @@ Solve complex defects and performance bottlenecks systematically using the scien
 
 ## Non-Negotiable Rules
 
-1. **Read playbooks first:** Load `references/profiling-playbooks.md` for the active stack before proposing fixes.
+1. **Read playbooks first:** Load only the active stack's section of `references/profiling-playbooks.md` before proposing fixes.
 2. **Never guess-patch:** Do not edit code until you have a concrete reproduction or hard telemetry/profiler evidence proving the root cause.
 3. **Measure before AND after:** Every performance optimization must report exact baseline metrics vs. post-fix metrics under identical conditions.
 4. **Fix the root cause, not the symptom:** Adding `sleep()`, swallowing an exception, or slapping a cache over a broken O(N^2) query is prohibited.
 5. **Lock every fix with a regression test:** Every bug fix must add an automated test that fails before the fix and passes after.
-6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+6. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
+7. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -45,7 +46,8 @@ Solve complex defects and performance bottlenecks systematically using the scien
    - Implement the cleanest root-cause fix upholding SOLID/KISS/ATOMIC principles.
    - Verify before/after metrics and run the full verification suite + `engg-audit` (Mode A) on the diff.
    - Report performance work as an **evidence table**: metric, baseline, after, same machine/data/load, number of runs, and the variance. A single run proves nothing. Repeat each measurement (at least 5 runs) and report the median and spread.
-6. **Emit Post-Incident Note (for P0/P1 defects):**
+6. **Record it:** a cause that cost time becomes one Gotchas line in `docs/HANDOFF.md`; an in-progress fix is the In progress entry until it merges.
+7. **Emit Post-Incident Note (for P0/P1 defects):**
    - Document Root Cause, Trigger Condition, Fix, Before/After Evidence, and Systemic Prevention (lint rule, invariant, or alert).
 
 ## Gotchas

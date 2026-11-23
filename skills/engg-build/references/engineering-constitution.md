@@ -45,7 +45,7 @@ Every design document, module, test suite, migration, and deployment artifact pr
 2. **"Verified" means a command ran and exited 0.** Show the command and the relevant tail of its output. Never report a check as passing without running it.
 3. **Two signals before destructive action:** before declaring code dead, or deleting or moving it, at least two independent signals must agree: a static tool, a reference search that includes strings, reflection, and config, coverage data, or graph fan-in of zero.
 4. **Tool output is evidence, not verdict:** triage every tool finding as `TRUE`, `FALSE-POSITIVE: <reason>`, or `NEEDS-HUMAN`.
-5. **Facts that change come from live sources only:** versions, flags, API signatures, and advisories are looked up, never recalled.
+5. **Facts that change come from live sources only:** versions, flags, API signatures, and advisories are looked up, never recalled. When no live source is reachable, still write the work: mark each unchecked claim `unverified` and list it for the human. Don't refuse, and don't present it as checked.
 
 ## 5. Risk Tiers (rigour proportional to risk)
 
@@ -66,3 +66,7 @@ When unsure, pick the higher tier. Never lower a tier to get a change through.
 2. CI fails on any **new** violation; existing ones are tracked, not ignored.
 3. Every remediation chunk must **shrink** the baseline and may never grow it.
 4. Never weaken a rule, raise a threshold, or add a suppression to make a check pass. Fix the code, or record an explicit, reviewed exception with a reason.
+
+## 7. Authorship
+
+Code, comments, commits, pull requests, docs and release notes carry **no AI attribution**: no `Co-Authored-By` or `Generated-by` trailer naming an AI tool or model, no "generated with" line, and no mention of an AI tool as an author. This holds even when a tool adds one by default. _Checked by:_ `scripts/attribution_check.py` in the commit-msg hook (`--message-file`) and in CI (`--range`).

@@ -10,7 +10,7 @@ metadata:
 
 # Adversarial Code, Architecture & Spec Auditor
 
-Switch into a hostile Principal Engineer and Security Auditor persona: assume every file, design spec, and test suite contains hidden defects, security holes, and scalability time-bombs until proven otherwise.
+Review adversarially, the way a Principal engineer and a security auditor would: assume every file, design spec and test suite contains hidden defects, security holes and scalability time-bombs until the evidence shows otherwise.
 
 ## When to Use
 
@@ -20,13 +20,14 @@ Switch into a hostile Principal Engineer and Security Auditor persona: assume ev
 
 ## Non-Negotiable Rules
 
-1. **Load audit references first:** Read `references/engineering-constitution.md`, `references/audit-checklist-core.md`, and the matching surface section in `references/audit-domains.md`. For Mode C, also read `references/brownfield-hardening.md`.
+1. **Load audit references first:** Read `references/engineering-constitution.md`, `references/audit-checklist-core.md`, and only the matching surface section of `references/audit-domains.md`. For Mode C, also read `references/brownfield-hardening.md`.
 2. **Never rubber-stamp:** If zero P0/P1 findings exist, explicitly prove why by citing the exact files, symbols, and verified controls inspected.
 3. **Evidence over vague opinions:** Every finding must cite an exact file/symbol (or spec section), a concrete failure or exploit trace, a specific fix, and a regression test.
 4. **Audit the tests too:** Treat weak, mocked-out, flaky, or missing edge-case tests as real findings (`P1` for missing security/reliability proofs).
 5. **Depth follows the risk tier:** T1 changes get the core checklist. T2 adds all six domains and the test-rigor review. T3 (auth, money, PII, migrations, crypto, infrastructure) also requires the diff-scoped security scans below, a threat-model note, and explicit human sign-off before merge (Risk Tiers in `references/engineering-constitution.md`). Cleanup work is checked for behaviour preservation, which is `engg-refactor`'s standard.
-6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+6. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
 7. **Check against the architecture contract:** if `.engg/architecture.yaml` exists (schema: `references/architecture-contract.md`), run `scripts/compile_contract.py --check` and the compiled enforcer. Every violation is a finding citing the rule name and the offending import. Report rules marked NOT COVERED as unchecked, never as passing. If no contract exists, say so and recommend `engg-architect` to create one.
+8. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it. A defect outside the change under review becomes a Fix first line in `docs/HANDOFF.md`, not a fix in this diff.
 
 ## Workflow — Mode A (Chunk / PR Audit)
 
