@@ -3,7 +3,7 @@ name: engg-research
 description: Enforces zero-memory-guessing live research for APIs, frameworks, SDKs, protocols, CVEs, and exact dependency version pinning across any package ecosystem. Use when selecting libraries, verifying current documentation or breaking changes, resolving dependency conflicts, checking security advisories, or pinning exact versions in lockfiles and catalogs.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

@@ -2,7 +2,9 @@
 
 All notable changes to this project. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the project uses [Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [2.1.0] - 2026-11-23
+
+2.1 makes the suite resumable and leaner. Every step leaves the project in files any new session can pick up from. Skills no longer block what you explicitly ask for, read less on each run, and keep AI attribution out of everything they produce.
 
 ### Added
 
@@ -105,5 +107,6 @@ v2 turns the suite from written guidance into **checked** guidance. Standards ar
 
 - Initial release: 11 skills covering ideation, roadmap, architecture, planning, test-first building, extension, audit, research, debugging, data and shipping, with installers and a validator.
 
+[2.1.0]: https://github.com/devnadeemashraf/engg-skills-suite/releases/tag/v2.1.0
 [2.0.0]: https://github.com/devnadeemashraf/engg-skills-suite/releases/tag/v2.0.0
 [1.0.0]: https://github.com/devnadeemashraf/engg-skills-suite/commit/7922d54

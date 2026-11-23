@@ -3,7 +3,7 @@ name: engg-architect
 description: Runs a rigorous, tech-agnostic Staff-level architectural grill session and produces a decision-complete Engineering Design Doc (EDD) and ADRs for any software surface (backend, web client, mobile client, game client, database, infrastructure/DevOps). Use when designing a new system, scaffolding a project, locking technical contracts, or formalizing architecture before planning or coding.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

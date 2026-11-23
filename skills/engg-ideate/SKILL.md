@@ -3,7 +3,7 @@ name: engg-ideate
 description: Brainstorms, pressure-tests, and frames software product or engineering ideas into a sharp, decision-ready Project Charter. Use when exploring a new project idea, evaluating technical feasibility, carving an MVP scope, comparing build approaches, or turning a vague concept into structured requirements before architectural design.
 license: Apache-2.0
 metadata:
-  version: "2.0.0"
+  version: "2.1.0"
   suite: "engg-skills-suite"
   standard: "agentskills.io"
 ---

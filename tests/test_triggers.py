@@ -46,7 +46,7 @@ def test_all_skills_share_the_suite_metadata() -> None:
         text = (REPO_ROOT / "skills" / skill / "SKILL.md").read_text(encoding="utf-8")
         meta = yaml.safe_load(text.split("---", 2)[1])["metadata"]
         assert meta["suite"] == "engg-skills-suite"
-        assert meta["version"] == "2.0.0", f"{skill} is still at {meta['version']}"
+        assert meta["version"] == "2.1.0", f"{skill} is still at {meta['version']}"
 
 
 # Skills that plan or build must all know the delivery mode and the baseline rule.
