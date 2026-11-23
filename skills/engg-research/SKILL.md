@@ -27,7 +27,8 @@ Eliminate hallucinated APIs, stale package versions, deprecated flags, and suppl
 5. **Justify every dependency:** Adding a dependency is taking on permanent security and maintenance liability. Reject bloated libraries when 20 lines of clean standard-library code suffice (KISS).
 6. **Read the web token-cheaply:** fetch docs, changelogs and release notes with `oc open <url>` / `oc raw <url>` (only-cli; if toolcheck reports `conflict`, use `npx @only-cli/oc`). Fall back to the agent's own web tool when `oc` exits 2 (a JavaScript-only page or a bot wall).
 7. **Verify the package is the real one:** confirm the registry entry links to the project's official repository, and watch for look-alike names. PyPI, for example, hosts unaffiliated `graphify*` packages next to the real `graphifyy`.
-8. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+8. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
+9. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -44,7 +45,7 @@ Eliminate hallucinated APIs, stale package versions, deprecated flags, and suppl
    - Pin exact versions in the project's central dependency catalog/manifest + commit updated lockfile.
    - Pin container base images by immutable SHA256 digest (`image:tag@sha256:...`) and CI actions by full commit SHA, resolving the SHA from the tag live (`git ls-remote https://github.com/<owner>/<repo> 'refs/tags/<tag>*'`). For an annotated tag, use the `^{}` line, which is the commit; the other line is the tag object.
    - Run the ecosystem's built-in vulnerability/license audit command.
-5. **Emit a dated Research Brief** (template in `references/version-pinning-policy.md`): verified versions, the date checked, a source link for every fact, breaking-change notes, and upgrade constraints. Downstream skills (`engg-architect`, `engg-build`, `engg-extend`, `engg-ship`) work from the brief, not from memory. Mark anything you couldn't verify as **unverified**; never present it as fact.
+5. **Emit a dated Research Brief** (template in `references/version-pinning-policy.md`): verified versions, the date checked, a source link for every fact, breaking-change notes, and upgrade constraints. Downstream skills (`engg-architect`, `engg-build`, `engg-extend`, `engg-ship`) work from the brief, not from memory. When a later session will need it, save it as `docs/research/<YYYY-MM-DD>-<topic>.md` and cite it from the chunk or ADR. Mark anything you couldn't verify as **unverified**; never present it as fact, and never withhold the brief because a source was unreachable.
 
 ## Gotchas
 

@@ -19,18 +19,19 @@ Grow an in-progress codebase rapidly without architectural drift by enforcing st
 
 ## Non-Negotiable Rules
 
-1. **Read references first:** Load `references/engineering-constitution.md` and `references/contract-test-patterns.md` before modifying code.
+1. **Read references first:** load `references/engineering-constitution.md` §1–3 and §5 before modifying code, plus `references/contract-test-patterns.md` for Mode B or whenever the change adds a port.
 2. **Match existing repo conventions strictly:** Inspect existing sibling modules/adapters first so naming, error types, DI wiring, and folder layout remain 100% consistent.
 3. **Never leak adapter details into core:** Domain code must never import SDK types, ORM models, HTTP frameworks, or vendor error codes. Map all external errors and DTOs at the adapter boundary.
 4. **Shared Contract Tests are mandatory for adapters:** Every port interface must have a reusable contract test suite that runs identically against fakes/in-memory implementations and every real adapter (proving Liskov Substitution).
 5. **Strict TDD + Post-Audit:** Follow `engg-build` test-first discipline and finish with `engg-audit` (Mode A).
-6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+6. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
 7. **Respect the architecture contract:** if `.engg/architecture.yaml` exists (schema: `references/architecture-contract.md`), use it to place the new slice or adapter in the right layer and module. Before declaring done, run `scripts/compile_contract.py --check` and then the enforcer command it prints. If the change needs a new layer or dependency direction, change the contract with the owner first; never work around it.
-8. **Stay inside the mode and the baseline:** check the new slice or adapter against `.engg/delivery.yaml` (`references/delivery-modes.md`). In `mvp-first` it must serve the `core_flow` or the current iteration's goal. With `baseline: existing`, extend the existing architecture and tools; never replace them.
+8. **Stay inside the mode and the baseline:** check the new slice or adapter against `.engg/delivery.yaml` (read `references/delivery-modes.md` only if that file is missing). In `mvp-first` it must serve the `core_flow` or the current iteration's goal. With `baseline: existing`, extend the existing architecture and tools; never replace them.
+9. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow — Mode A: Vertical Feature Module
 
-1. **Inspect Existing Architecture:** Pick 1–2 reference vertical slices with the graph rather than browsing: `graphify query "<feature like the new one>"` and `graphify explain "<its entry point>"` show the files and wiring. Read those slices to align with conventions, error envelopes, validation, and DI wiring. Place the new slice in the layers and module `.engg/architecture.yaml` prescribes.
+1. **Inspect Existing Architecture:** Pick 1–2 reference vertical slices (the chunk's Follow files, if it names them) with tools rather than browsing: `graphify query "<feature like the new one>"` and `graphify explain "<its entry point>"`, or `scripts/map.py <module dir>` and `rg`, show the files and wiring. Read those slices to align with conventions, error envelopes, validation, and DI wiring. Place the new slice in the layers and module `.engg/architecture.yaml` prescribes.
 2. **Define Slice Contract:** Lock explicit input/output DTOs, domain types/invariants, error cases, authorization rules, and any new port methods needed.
 3. **Write Tests First:**
    - Domain unit tests (pure business rules & invariants).
@@ -38,7 +39,7 @@ Grow an in-progress codebase rapidly without architectural drift by enforcing st
    - End-to-end vertical integration test covering the complete slice.
 4. **Implement Inside-Out:**
    - Domain entities & rules -> Application use-case/service -> Adapter persistence/client implementation -> Transport/UI handler -> Composition root wiring.
-5. **Verify & Audit:** Run the gates for the slice's risk tier (Risk Tiers in `references/engineering-constitution.md`): tests, lint, typecheck, and the compiled architecture enforcer, which must report **zero new violations**. New code never enters a ratchet baseline. Then execute `engg-audit`.
+5. **Verify & Audit:** Run the gates for the slice's risk tier (Risk Tiers in `references/engineering-constitution.md`): tests, lint, typecheck, and the compiled architecture enforcer, which must report **zero new violations**. New code never enters a ratchet baseline. Then execute `engg-audit`, and close the chunk (`references/working-loop.md` §3).
 
 ## Workflow — Mode B: Swappable Infrastructure Adapter
 
@@ -49,7 +50,7 @@ Grow an in-progress codebase rapidly without architectural drift by enforcing st
 4. **Implement Adapter & Wiring:**
    - Implement explicit timeouts, bounded pools, structured error translation, telemetry hooks, and health/readiness check integration.
    - Wire into composition root via config/feature toggle so swapping implementations requires zero domain edits.
-5. **Run Contract Suite + Audit:** Execute the shared contract suite against both the reference fake and the new real adapter (ephemeral container/emulator), then run `engg-audit`.
+5. **Run Contract Suite + Audit:** Execute the shared contract suite against both the reference fake and the new real adapter (ephemeral container/emulator), then run `engg-audit`, and close the chunk (`references/working-loop.md` §3).
 
 ## Gotchas
 

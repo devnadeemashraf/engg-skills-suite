@@ -20,11 +20,12 @@ Transform raw product or technical concepts into a clear, feasibility-tested **P
 
 ## Non-Negotiable Rules
 
-1. **No premature architecture or code:** Do not jump into tech stacks, database schemas, or scaffolding during ideation. Lock the _problem, user, and value_ first.
+1. **Problem before solution:** settle the _problem, user and value_ before stacks, schemas or scaffolding. When the user already has a stack or design in mind, record it in the charter as a constraint or an open question for `engg-architect`. Discuss it; don't refuse it.
 2. **Load rubric before facilitating:** Read `references/ideation-rubric.md` before starting the framing session.
 3. **Challenge assumptions candidly:** Surface hidden risks, market/technical blind spots, and build-vs-buy alternatives immediately rather than rubber-stamping every idea.
 4. **Enforce sharp V1 boundaries:** Every Project Charter must contain explicit **Out-of-Scope / Non-Goals** to prevent scope creep.
-5. **Settle the delivery mode early:** before writing the charter, ask the delivery-mode question in `references/delivery-modes.md` and record the answer in the charter (and in `.engg/delivery.yaml` once a repository exists). For `mvp-first`, name the one `core_flow` the V1 slice must demonstrate.
+5. **Settle the delivery mode early:** before writing the charter, ask the delivery-mode question in `references/delivery-modes.md` §1 and record the answer in the charter (and in `.engg/delivery.yaml` once a repository exists). For `mvp-first`, name the one `core_flow` the V1 slice must demonstrate.
+6. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -40,15 +41,14 @@ Transform raw product or technical concepts into a clear, feasibility-tested **P
    - Select the winning direction with the user.
    - Define the **Walking Skeleton (V0)** and **Minimum Lovable Product (V1)** user journeys (max 3–5 core flows).
    - Explicitly list **Non-Goals (Deferred to V2+)**.
-4. **Emit Locked Project Charter:**
-   - Produce a concise, decision-complete **Project Charter** containing:
-     - Problem Statement & Target Users
-     - Chosen Approach & Rejected Alternatives (with rationale)
-     - Core V1 Journeys & Measurable Success Criteria: each criterion a number with a unit and a time window (e.g. "60% of trial users complete checkout within 7 days"), never an adjective like "fast" or "easy"
-     - Explicit Non-Goals
-     - Key Unknowns, Constraints & Validation Experiments
-     - Target Surfaces & Initial Resource/Time Constraints
-5. **Handoff Gate:** Ask the user to approve or revise the Project Charter. Once approved, hand off to `engg-architect` for technical design (greenfield) or `engg-roadmap` if aligning into an existing product roadmap.
+4. **Write the Project Charter** to `docs/CHARTER.md`, with numbered sections (`## 1. Problem and users`) so later chunks can cite them:
+   - Problem Statement & Target Users
+   - Chosen Approach & Rejected Alternatives (with rationale)
+   - Core V1 Journeys & Measurable Success Criteria: each criterion a number with a unit and a time window (e.g. "60% of trial users complete checkout within 7 days"), never an adjective like "fast" or "easy"
+   - Explicit Non-Goals
+   - Key Unknowns, Constraints & Validation Experiments
+   - Target Surfaces & Initial Resource/Time Constraints
+5. **Handoff Gate:** Create or update `docs/HANDOFF.md` (`references/working-loop.md` §4: Stage `ideate`, Next: approve the charter). Ask the user to approve or revise the charter. Once approved, hand off to `engg-architect` for technical design (greenfield) or `engg-roadmap` if aligning into an existing product roadmap.
 
 ## Gotchas
 

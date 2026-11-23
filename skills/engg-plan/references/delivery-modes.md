@@ -50,7 +50,7 @@ Commit it with the plan.
 | **Chunk size** | One step of the core flow per chunk, vertical and demonstrable. | Smaller chunks, one concern each. |
 | **Default risk tier** | T1. Raise a chunk to T2/T3 by what it touches (auth, money, PII, migrations stay T3). | T2. T1 only for trivial chunks. |
 | **Deferred to iterations** | Non-core features, polish, extra adapters, performance work beyond stated budgets, and refactors or hardening of code the core flow doesn't need, all logged in a backlog. | Nothing is deferred by default; every planned part is finished before the next. |
-| **Docs** | README, setup, ADRs for irreversible choices. No other doc passes until the core flow works. | Docs updated with every chunk. |
+| **Docs** | Always written when their step needs them: the charter, EDD, ADRs, blueprint, handoff, agent file, README and setup, plus any document the user asks for. Deferred: optional polish documentation, such as tutorials or long guides, until the core flow works. | Docs updated with every chunk. |
 | **After the MVP** | One small chunk per feature, improvement or fix, each shippable alone, in backlog priority order. | n/a |
 | **Done means** | The core flow works end-to-end on a real environment, with CI green. | Every planned part is complete and green. |
 
@@ -70,6 +70,8 @@ Commit it with the plan.
 | `greenfield` | Nothing exists yet | Design it (`engg-architect`), then build it. |
 | `existing` | The project already has an architecture (a contract, ADRs or documented layers), tooling (CI, linters, formatter, test runner) and conventions | **They are fixed.** Build within them. Don't redesign the architecture, re-layout folders, swap tools, or "clean up" code outside the current chunk. Any improvement you notice goes in the backlog with a reason, not into the chunk. |
 | `redo` | The user explicitly asked to rebuild or redesign | Only then: re-architect with `engg-architect`, and plan the migration with `engg-refactor`. |
+
+An explicit request such as "re-architect it", "start over" or "assume every decision is wrong" sets `baseline: redo` at once. Record it in `.engg/delivery.yaml` with the date and the user's words, and route the redesign to `engg-architect`. From then on, don't treat the old design as fixed. Reuse the code that still fits.
 
 Decide the baseline from what's in the repository: an architecture doc or contract, CI config, lint config, a test suite. Then confirm it with the user in the same question as the mode. Never assume `redo`.
 

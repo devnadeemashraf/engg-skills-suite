@@ -24,10 +24,13 @@ Break complex systems, features, or remediation backlogs into small, vertical, i
 2. **Thin vertical slices over horizontal layers:** Never plan "Chunk 1: all DB tables, Chunk 2: all services, Chunk 3: all UI." Every chunk must deliver an end-to-end verifiable vertical slice or a self-contained foundational capability.
 3. **No bloated Wave 1:** Wave 1 is the leanest production-grade skeleton—never bundle multi-region failover, secondary caches, or nice-to-have features into Chunk 1.
 4. **Right-sized atomic chunks:** Each chunk must be small enough to implement via strict TDD and audit completely in a single focused session (typically 1–5 tightly related files/modules plus tests).
-5. **Explicit exit criteria:** Every chunk must define concrete **Definition of Done (DoD)** checks and **Key Edge Cases to Prove in Tests**.
+5. **Explicit exit criteria:** Every chunk must define concrete **Definition of Done (DoD)** checks and numbered **Test cases**, derived from equivalence classes and boundaries (`references/chunk-template.md`).
 6. **Tier every chunk; gates are commands.** Assign each chunk a risk tier (T0–T3). Its gates are the exact commands that must exit 0 for that tier, never prose like "tests pass". When unsure, pick the higher tier.
 7. **Every chunk is reversible and measurable.** State its rollback (usually "revert the commit"; migrations and flags need more), and for brownfield work its **ratchet delta**: which baseline violations it removes. A chunk that can't shrink the baseline or ship a verified behaviour is not a chunk.
-8. **Plan to the delivery mode:** read `.engg/delivery.yaml`, or ask the question in `references/delivery-modes.md` first. The mode sets Wave 1, chunk size, the default tier and what goes to the backlog. Record the mode and baseline at the top of the plan.
+8. **Plan to the delivery mode:** read `.engg/delivery.yaml`, or ask the question in `references/delivery-modes.md` §1 first. The mode sets Wave 1, chunk size, the default tier and what goes to the backlog (§3). Record the mode and baseline at the top of the plan.
+9. **Detail only the next wave.** Full cards for the next wave; one line per chunk for later waves, split at their wave gate. A plan written months ahead goes stale and costs every session tokens to read.
+10. **The plan lives in the repo:** `docs/BLUEPRINT.md`, in the template's layout, so any session can resume it with `scripts/brief.py`.
+11. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -44,16 +47,20 @@ Break complex systems, features, or remediation backlogs into small, vertical, i
      - **Chunk ID & Name**
      - **Wave & Goal (User/System Value Delivered)**
      - **Dependencies (Upstream Chunks)**
-     - **Files / Modules Created or Modified**
+     - **Cites** (EDD and charter sections) · **Follow** (files to mirror) · **Files in scope**
      - **Design Invariants Applied (SOLID / Hexagonal / Budgets)**
      - **Risk Tier & Gates (exact commands)**
      - **Definition of Done (Concrete Verifiable Criteria)**
-     - **Mandatory Edge Cases for the Test Matrix**
+     - **Numbered Test Cases**
      - **Ratchet Delta & Rollback**
 4. **Render Dependency Map & Roadmap Table:**
    - Present a clean summary table showing Chunk ID, Wave, Tier, Goal, Dependencies, and Estimated Scope, followed by detailed chunk cards.
    - Highlight parallelizable chunks (if multiple engineers or agents will execute concurrently).
-5. **Approval Gate:** Ask the user to approve or adjust the chunk roadmap and confirm which chunk to execute first (defaulting to Chunk 1). Hand off to `engg-build` (new behaviour), `engg-extend` (new slice or adapter), or `engg-refactor` (structural cleanup).
+5. **Write it down and set up the loop** (`references/working-loop.md` §4):
+   - `docs/BLUEPRINT.md` with the plan.
+   - `AGENTS.md` from `assets/agents-template.md`, filled with the project's real commands, layers and naming rules (from the EDD and `.engg/architecture.yaml`), and `CLAUDE.md` containing `@AGENTS.md`. If either exists, add only the missing sections, and ask before changing the user's text. If the project already runs its own loop, map onto it instead.
+   - `.engg/check.toml` with the gate commands, fastest first, and `docs/HANDOFF.md` (Stage `plan`).
+6. **Approval Gate:** Ask the user to approve or adjust the blueprint and confirm which chunk to execute first (defaulting to Chunk 1). Hand off to `engg-build` (new behaviour), `engg-extend` (new slice or adapter), or `engg-refactor` (structural cleanup).
 
 ## Gotchas
 

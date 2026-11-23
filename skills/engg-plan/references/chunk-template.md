@@ -1,5 +1,28 @@
 # Chunk Specification Template & Sizing Rules
 
+The plan lives in `docs/BLUEPRINT.md`, in this layout, so `scripts/brief.py` can print the next chunk:
+
+```markdown
+# Blueprint
+<plan header, below>
+
+## Done
+- C1 Bootstrap, config, harness and CI — Wave 1 — #3
+- Gate 1 — 2026-12-02
+
+## Wave 2 — Security and resilience
+### [C4] Rate limits on public routes (Wave 2, Tier T2)
+<full card, below>
+
+## Wave 3 — Features (outline)
+- C7 Export to PDF — depends on C4 — goal: <one line>
+
+## Backlog
+```
+
+- **Detail only the next wave.** Later waves are one line per chunk until their wave gate splits them, so plans stay fresh and cheap to read.
+- **Closing a chunk** deletes its card and adds one Done line. Nothing else in the file changes.
+
 ## Plan Header (top of every plan)
 
 ```markdown
@@ -41,9 +64,9 @@ Work noticed but outside the mode or the current wave: deferred features, polish
 - **Executor:** <engg-build | engg-extend | engg-refactor | engg-data>
 - **Findings addressed:** <None | U004-01, S-application-01>   (brownfield only)
 - **Dependencies:** <None | C1, C2>
-- **Files / Modules:**
-  - Create: `<path/to/module>`, `<path/to/test>`
-  - Modify: `<path/to/wiring>`
+- **Cites:** <EDD §3, §5 · CHARTER §2 · ADR-0004>   (brief.py prints these sections with the card)
+- **Follow:** `<path of the closest existing file to mirror>`, `<its test>`   (none for the very first slice)
+- **Files in scope:** `<path/to/module>`, `<path/to/test>`, `<path/to/wiring>`   (anything else needs the user's yes)
 - **Architectural & Design Invariants:**
   - <e.g., Core domain has zero framework imports; port interface defined in domain package>
 - **Gates (exact commands):**
@@ -52,11 +75,12 @@ Work noticed but outside the mode or the current wave: deferred features, polish
   - [ ] Every gate above exits 0, with zero skipped or flaky tests
   - [ ] The test categories required by the tier are present and can fail (proven once)
   - [ ] `engg-audit` reports zero P0/P1 findings (T2+)
-- **Key Edge Cases to Prove in Tests:**
-  - <Boundary / malformed input case>
-  - <Concurrency / ordering / retry case>
-  - <Failure / fault-injection case>
-  - <Security / isolation / abuse case>
+- **Test cases** (each becomes a test named `[<ID> #<n>] <case>`; 4–10, never more than 12):
+  1. <given state and input → expected result — risk in ≤ 8 words>   (boundary / malformed input)
+  2. <...>   (concurrency / ordering / retry)
+  3. <...>   (failure / fault injection)
+  4. <...>   (security / isolation / abuse)
+  Derive cases, don't brainstorm them: one per equivalence class or boundary that could fail differently. Where a rule can be stated generally (parsing, money, dates, permissions, state transitions), use one property-based test.
 - **Ratchet delta:** <e.g. removes `dependency-cruiser:transport-not-to-adapters:src/orders/http/routes.ts->...` (baseline 6 -> 5) | none: new code, must add 0>
 - **Rollback:** <revert the commit | feature flag `<name>` off | migration down-step `<file>` verified on a copy>
 ```
@@ -69,7 +93,9 @@ Work noticed but outside the mode or the current wave: deferred features, polish
 - **Executor:** engg-build (behaviour change, test-first)
 - **Findings addressed:** U004-01
 - **Gates:** `bash test.sh` · `npx depcruise ...` · `gitleaks dir src --redact ...` · `python scripts/ratchet.py check ... --require-tight`
-- **Key Edge Cases:** an id of `x' OR '1'='1` returns no rows; the SQL text sent to the database never contains caller input.
+- **Test cases:**
+  1. id `x' OR '1'='1` → no rows — injection through the id
+  2. any id → the SQL text sent never contains caller input — query built by concatenation
 - **Ratchet delta:** none (injection isn't a contract rule); covered by a new test instead.
 - **Rollback:** revert the commit.
 ```

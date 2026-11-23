@@ -19,19 +19,20 @@ Implement one planned chunk at a time using disciplined **Red -> Green -> Refact
 
 ## Non-Negotiable Rules
 
-1. **Load standards first:** Read `references/engineering-constitution.md`, `references/test-matrix-guide.md`, and the matching stack section in `references/domain-standards.md` before writing any code.
+1. **Load standards first:** read `references/engineering-constitution.md` §1–3 and §5, `references/test-matrix-guide.md`, and only the matching stack section of `references/domain-standards.md`, before writing any code.
 2. **Strict test-first order, scaled by tier:** Write the runnable tests **before** the production code, and see them fail for the right reason. The chunk's risk tier (Risk Tiers in `references/engineering-constitution.md`) sets the depth: T1 needs happy-path and boundary tests; T2 and T3 need all five matrix categories; T3 also needs mutation testing on the changed code. Never drop below the tier.
 3. **One chunk at a time:** Finish implementing, verifying, and auditing (`engg-audit`) the current chunk before starting the next—unless the user explicitly requests batching.
 4. **Zero memory-guessing on libraries:** If adding or upgrading any dependency or calling an unfamiliar API, run `engg-research` first to verify live docs and exact pinned versions.
 5. **No shortcuts:** Never swallow errors, bypass type safety (`any`/`unsafe` without documented proof), omit timeouts/bounds, hardcode secrets, or weaken a failing test to make it pass.
 6. **The architecture contract is part of green:** if `.engg/architecture.yaml` exists, the compiled enforcer runs with the tests, and a new violation means red. Never touch the ratchet baseline to make room for new code.
-7. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
-8. **Stay inside the mode and the baseline:** before starting, check the chunk against `.engg/delivery.yaml` (`references/delivery-modes.md`). In `mvp-first` it must serve the `core_flow` or a critical item. With `baseline: existing`, never change the architecture, layout or tooling; log improvements to the backlog instead.
+7. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
+8. **Stay inside the mode and the baseline:** before starting, check the chunk against `.engg/delivery.yaml` (read `references/delivery-modes.md` only if that file is missing). In `mvp-first` it must serve the `core_flow` or a critical item. With `baseline: existing`, never change the architecture, layout or tooling; log improvements to the backlog instead.
+9. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
 1. **Chunk Contract Verification:**
-   - Restate the chunk's Goal, Files/Modules, Contracts, and Definition of Done.
+   - Take the chunk from `scripts/brief.py` (or the one the user named). Read only the files it names and its Follow files; don't restate it back.
    - Confirm the chunk's risk tier and its gate commands. If the plan has none, assign the tier yourself; when unsure, pick the higher one.
    - Verify no architectural boundary violations (e.g., domain importing transport/UI/DB/engine packages).
    - **Chunk 1 of a project:** wire the harness first. That means formatter, linter, typecheck and test commands; pre-commit hooks (lefthook or pre-commit) running them plus a secret scan; and CI running the same commands plus the compiled architecture contract.
@@ -57,7 +58,8 @@ Implement one planned chunk at a time using disciplined **Red -> Green -> Refact
      - The compiled architecture enforcer (and `ratchet.py check` in brownfield repos)
      - **T3 only:** mutation testing on the changed files (Stryker, mutmut, cargo-mutants, PIT). Surviving mutants mean missing tests: add them, or record why a mutant is equivalent.
 6. **Step 5 — Mandatory Audit Handoff:**
-   - Immediately transition to `engg-audit` (Mode A) to adversarially review every file created or modified in this chunk before marking it Done or committing.
+   - Immediately transition to `engg-audit` (Mode A) to adversarially review every file created or modified in this chunk before marking it Done or committing. For T2 and T3, a fresh session on a different model catches more.
+7. **Step 6 — Close the chunk** (`references/working-loop.md` §3): commit, run `scripts/attribution_check.py --range <base>..HEAD`, close the chunk in `docs/BLUEPRINT.md`, update `docs/HANDOFF.md`, and report in at most 8 lines.
 
 ## Gotchas
 

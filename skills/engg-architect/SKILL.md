@@ -20,14 +20,15 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
 
 ## Non-Negotiable Rules
 
-1. **No premature code:** Never generate implementation files or boilerplate until the EDD is explicitly approved by the user.
-2. **Load references before starting:** Always read `references/engineering-constitution.md`, `references/grill-bank-core.md`, and the matching section(s) of `references/domain-profiles.md` before Round 1.
+1. **Design before code:** writing the EDD, ADRs and contract files is this skill's job, so write them as decisions lock. What waits for the user's explicit approval is implementation code and scaffolding.
+2. **Load references before starting:** read `references/engineering-constitution.md` §1–2, `references/grill-bank-core.md`, and only the `references/domain-profiles.md` sections for the active surfaces, before Round 1.
 3. **Stay genuinely tech-agnostic until locked:** Never silently assume a language, framework, engine, database, or cloud provider. Ask or propose one concrete, justified recommendation and get sign-off.
 4. **Verify live versions when selecting a stack:** If concrete libraries/frameworks/runtimes are chosen, invoke `engg-research` (or verify against current docs) rather than guessing versions from memory.
 5. **Enforce design invariants:** Every EDD must explicitly codify SOLID, DRY, KISS, ATOMIC boundaries, Hexagonal/Clean dependency flow, explicit contracts, security controls, and hard resource/performance budgets.
-6. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+6. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
 7. **Architecture is a machine-checked contract, not just a diagram:** every locked EDD ships with `.engg/architecture.yaml` written to the schema in `references/architecture-contract.md`. Compile it with `scripts/compile_contract.py` and never hand-write enforcer configs.
-8. **Design only what isn't fixed:** with `baseline: existing` (`references/delivery-modes.md`), the current architecture and tooling are the baseline. Write the contract as it is and extend it; never redesign unless the user explicitly asks (`baseline: redo`).
+8. **Design only what isn't fixed:** with `baseline: existing` (`references/delivery-modes.md` §5), the current architecture and tooling are the baseline. Write the contract as it is and extend it. When the user explicitly asks for a redesign, set `baseline: redo` and redesign, reusing the code that still fits.
+9. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -43,7 +44,7 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
    - Reject hand-wavy answers ("standard auth", "make it scalable", "normal UI", "add tests later").
    - Surface contradictions immediately (e.g., "zero-latency offline mobile sync" + "strict global linearizability").
    - When the user says "pick best practice," propose one concrete opinionated default, explain the trade-off in one sentence, and log it under **Recorded Assumptions**.
-4. **Produce the Locked Engineering Design Doc (EDD) & Key ADRs:**
+4. **Write the Engineering Design Doc to `docs/EDD.md`, plus ADRs.** Number its top-level sections (`## 3. Contracts`) so chunks can cite `EDD §3`. It is the project's living big picture: a reader new to the code should find each module's job, public entry and dependencies within one screen. It holds:
    - Goals & Explicit Non-Goals
    - System & Module Architecture: C4 **context** and **container** views (Mermaid, so they live in the repo and diff in review) plus a module tree showing dependency direction and Ports & Adapters. Default to a **modular monolith**; split into services only when a stated budget or team boundary requires it, and write the ADR that says which.
    - Chosen Tech Stack & Rationale (with pinned target versions)
@@ -58,7 +59,7 @@ Eliminate architectural ambiguity and baked-in technical debt before a single li
    - **Brownfield:** first draft the as-is contract from the directory layout and the dependency graph (graphify or the native enforcer). Agree the to-be contract with the owner, and record the gap as a migration delta. Existing violations become a ratchet baseline; never loosen the contract to hide them.
    - Run `scripts/compile_contract.py` and show its coverage report. Any rule marked NOT COVERED for a target must appear in the EDD with how it will be checked instead.
    - Run the generated enforcer once and report the result (clean, or the violation count for the baseline).
-6. **Approval Gate:** Ask the user to explicitly approve or revise the EDD and the contract. Upon approval, hand off to `engg-plan` to decompose the EDD into MVP-first execution chunks. Wiring the enforcer into pre-commit and CI belongs in Chunk 1.
+6. **Approval Gate:** Update `docs/HANDOFF.md` (Stage `architect`, Next: approve the EDD, then `engg-plan`). Ask the user to explicitly approve or revise the EDD and the contract. Upon approval, hand off to `engg-plan` to decompose the EDD into MVP-first execution chunks. Wiring the enforcer into pre-commit and CI belongs in Chunk 1.
 
 ## Gotchas
 

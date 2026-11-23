@@ -26,7 +26,8 @@ Design durable, high-performance data models and zero-downtime schema evolutions
 4. **Verify real query plans:** Every non-trivial query or new index must be validated with realistic cardinality via `EXPLAIN (ANALYZE, BUFFERS)` (or datastore equivalent).
 5. **Bounded, idempotent backfills:** Data migrations must execute in throttled, resumable, idempotent batches—never one giant locking transaction.
 6. **Migrations are linted by a machine:** run `squawk <migration>.sql` (Postgres) on every migration file in CI, so a lock-taking or table-rewriting statement can't merge on review alone. Migrations are risk tier **T3** (`references/engineering-constitution.md`).
-7. **Use the open-source toolchain, with consent:** run `scripts/toolcheck.sh` (Windows: `scripts/toolcheck.ps1`) from this skill's folder to see which tools in `references/toolchain.md` are installed, and prefer them over reading code by hand. Never install a missing tool without following `references/tool-consent.md`.
+7. **Tools, with consent:** run `scripts/toolcheck.sh <tools>` (Windows: `scripts/toolcheck.ps1`) for the tools this step needs, and prefer them over reading code by hand. Read only those tools' rows in `references/toolchain.md`, and `references/tool-consent.md` only before proposing an install.
+8. **Working loop** (`references/working-loop.md`): start from `scripts/brief.py`, find files with `scripts/map.py` before reading them, run gates with `scripts/check.py`, and finish by updating `docs/HANDOFF.md` (§3). The user's explicit request outranks these defaults (§5). No AI attribution anywhere; `scripts/attribution_check.py` checks it.
 
 ## Workflow
 
@@ -44,7 +45,7 @@ Design durable, high-performance data models and zero-downtime schema evolutions
 4. **Verification Suite:**
    - Test migrations against an ephemeral real engine: fresh DB apply, upgrade from previous version with populated realistic data, backward compatibility with N-1 application code, and concurrency/isolation edge cases.
    - Check query plans on **realistic volumes**: load or generate data at production-like cardinality first. A plan on a 100-row dev table says nothing about the 50-million-row production one. Record `EXPLAIN (ANALYZE, BUFFERS)` before and after.
-5. **Audit Handoff:** Validate schema, queries, and migrations through `engg-audit` (Mode A) before release.
+5. **Audit Handoff:** Record a data-model change in `docs/EDD.md` (and an ADR if it's a lasting decision). Validate schema, queries, and migrations through `engg-audit` (Mode A) before release.
 
 ## Gotchas
 

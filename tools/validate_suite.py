@@ -31,6 +31,9 @@ REQUIRED_FIELDS = {"name", "description", "license", "metadata"}
 REQUIRED_METADATA_KEYS = {"version", "suite"}
 RESOURCE_DIRS = ("references", "scripts", "assets")
 FORBIDDEN_TERMS = ["google", "faang", "anthropic", "openai", "meta", "amazon"]
+# Files that must name vendors to do their job. attribution_check.py matches AI vendors' noreply
+# addresses and product names in order to block attribution; the brand rule targets prose, not detectors.
+BRAND_CHECK_EXEMPT = {"scripts/attribution_check.py"}
 TEXT_SUFFIXES = {".md", ".txt", ".yaml", ".yml", ".json", ".py", ".sh", ".ps1"}
 
 # A resource mention: `references/x.md`, `scripts/x.py`, `assets/x` (backticked or in a link).
@@ -138,6 +141,8 @@ def is_cache(path: Path) -> bool:
 def check_brand_names(skills_root: Path, sdir: Path) -> list[str]:
     errors: list[str] = []
     for fpath in sorted(p for p in sdir.rglob("*") if p.is_file() and p.suffix in TEXT_SUFFIXES):
+        if fpath.relative_to(sdir).as_posix() in BRAND_CHECK_EXEMPT:
+            continue
         text = read_text(fpath).lower()
         for term in FORBIDDEN_TERMS:
             if re.search(rf"\b{term}\b", text):

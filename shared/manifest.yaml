@@ -44,3 +44,30 @@ groups:
     files:
       - references/delivery-modes.md
     skills: [engg-architect, engg-build, engg-deep-audit, engg-extend, engg-ideate, engg-plan, engg-refactor, engg-roadmap]
+
+  working-loop:
+    files:
+      - references/working-loop.md
+      - scripts/brief.py
+      - scripts/map.py
+      - scripts/check.py
+      - scripts/attribution_check.py
+    skills:
+      - engg-architect
+      - engg-audit
+      - engg-build
+      - engg-data
+      - engg-debug
+      - engg-deep-audit
+      - engg-extend
+      - engg-ideate
+      - engg-plan
+      - engg-refactor
+      - engg-research
+      - engg-roadmap
+      - engg-ship
+
+  agent-file:
+    files:
+      - assets/agents-template.md
+    skills: [engg-plan]
